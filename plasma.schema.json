@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "MPIEMSES3D plasma.toml",
-  "description": "Initial JSON Schema for MPIEMSES3D TOML input. Top-level groups are strict; individual groups intentionally allow additional properties so the schema can be extended incrementally without blocking existing cases.",
+  "description": "JSON Schema for MPIEMSES3D TOML input. Top-level groups are strict; individual groups allow additional properties so the schema can be extended incrementally.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -10,70 +10,92 @@
       "description": "Optional editor schema hint. Ignored by MPIEMSES3D."
     },
     "meta": {
-      "$ref": "#/$defs/meta_group"
+      "$ref": "#/$defs/meta_group",
+      "description": "Unit conversion metadata (not read by the Fortran solver)."
     },
     "real": {
-      "$ref": "#/$defs/real_group"
+      "$ref": "#/$defs/real_group",
+      "description": "Physical constants used by the preprocessor (preinp)."
     },
     "realcv": {
-      "$ref": "#/$defs/realcv_group"
+      "$ref": "#/$defs/realcv_group",
+      "description": "Derived conversion values used by the preprocessor (preinp)."
     },
     "esorem": {
-      "$ref": "#/$defs/esorem_group"
+      "$ref": "#/$defs/esorem_group",
+      "description": "Field solver mode selection."
     },
     "jobcon": {
-      "$ref": "#/$defs/jobcon_group"
+      "$ref": "#/$defs/jobcon_group",
+      "description": "Job execution control."
     },
     "digcon": {
-      "$ref": "#/$defs/digcon_group"
+      "$ref": "#/$defs/digcon_group",
+      "description": "Diagnostic and output control."
     },
     "plasma": {
-      "$ref": "#/$defs/plasma_group"
+      "$ref": "#/$defs/plasma_group",
+      "description": "Plasma species and field parameters."
     },
     "tmgrid": {
-      "$ref": "#/$defs/tmgrid_group"
+      "$ref": "#/$defs/tmgrid_group",
+      "description": "Time and spatial grid definition."
     },
     "system": {
-      "$ref": "#/$defs/system_group"
+      "$ref": "#/$defs/system_group",
+      "description": "System-wide control flags and boundary conditions."
     },
     "intp": {
-      "$ref": "#/$defs/intp_group"
+      "$ref": "#/$defs/intp_group",
+      "description": "Particle integration and initialization."
     },
     "others": {
-      "$ref": "#/$defs/others_group"
+      "$ref": "#/$defs/others_group",
+      "description": "Miscellaneous parameters."
     },
     "inp": {
-      "$ref": "#/$defs/inp_group"
+      "$ref": "#/$defs/inp_group",
+      "description": "Particle injection at domain boundaries."
     },
     "ptcond": {
-      "$ref": "#/$defs/ptcond_group"
+      "$ref": "#/$defs/ptcond_group",
+      "description": "Surface and conductor boundary settings."
     },
     "wave": {
-      "$ref": "#/$defs/wave_group"
+      "$ref": "#/$defs/wave_group",
+      "description": "Wave excitation parameters."
     },
     "scrnt": {
-      "$ref": "#/$defs/scrnt_group"
+      "$ref": "#/$defs/scrnt_group",
+      "description": "Screen current diagnostics."
     },
     "jsrc": {
-      "$ref": "#/$defs/jsrc_group"
+      "$ref": "#/$defs/jsrc_group",
+      "description": "Local oscillating current sources."
     },
     "testch": {
-      "$ref": "#/$defs/testch_group"
+      "$ref": "#/$defs/testch_group",
+      "description": "Static test charges."
     },
     "dipole": {
-      "$ref": "#/$defs/dipole_group"
+      "$ref": "#/$defs/dipole_group",
+      "description": "Embedded magnetic dipole sources."
     },
     "emissn": {
-      "$ref": "#/$defs/emissn_group"
+      "$ref": "#/$defs/emissn_group",
+      "description": "Particle emission from surfaces."
     },
     "mpi": {
-      "$ref": "#/$defs/mpi_group"
+      "$ref": "#/$defs/mpi_group",
+      "description": "MPI domain decomposition."
     },
     "verbose": {
-      "$ref": "#/$defs/verbose_group"
+      "$ref": "#/$defs/verbose_group",
+      "description": "Verbosity and debug control."
     },
     "gradema": {
-      "$ref": "#/$defs/gradema_group"
+      "$ref": "#/$defs/gradema_group",
+      "description": "Surface charging acceleration control."
     }
   },
   "$defs": {
@@ -127,86 +149,52 @@
     },
     "num_value": {
       "oneOf": [
-        {
-          "$ref": "#/$defs/num"
-        },
-        {
-          "$ref": "#/$defs/num_array"
-        },
-        {
-          "$ref": "#/$defs/num_matrix"
-        }
+        { "$ref": "#/$defs/num" },
+        { "$ref": "#/$defs/num_array" },
+        { "$ref": "#/$defs/num_matrix" }
       ]
     },
     "int_value": {
       "oneOf": [
-        {
-          "$ref": "#/$defs/int"
-        },
-        {
-          "$ref": "#/$defs/int_array"
-        },
-        {
-          "$ref": "#/$defs/int_matrix"
-        }
+        { "$ref": "#/$defs/int" },
+        { "$ref": "#/$defs/int_array" },
+        { "$ref": "#/$defs/int_matrix" }
       ]
     },
     "bool_value": {
       "oneOf": [
-        {
-          "$ref": "#/$defs/bool"
-        },
-        {
-          "$ref": "#/$defs/bool_array"
-        }
+        { "$ref": "#/$defs/bool" },
+        { "$ref": "#/$defs/bool_array" }
       ]
     },
     "str_value": {
       "oneOf": [
-        {
-          "$ref": "#/$defs/str"
-        },
-        {
-          "$ref": "#/$defs/str_array"
-        }
+        { "$ref": "#/$defs/str" },
+        { "$ref": "#/$defs/str_array" }
       ]
     },
     "meta_group": {
       "type": "object",
+      "description": "Unit conversion metadata. Not consumed by the solver; preserved for post-processing and visualization.",
       "additionalProperties": false,
       "properties": {
         "unit_conversion": {
           "type": "object",
+          "description": "Normalization keys that map simulation units to physical units.",
           "additionalProperties": false,
           "properties": {
             "dx": {
+              "description": "Grid spacing in physical units [m]. Corresponds to !!key dx=[…] in plasma.inp.",
               "oneOf": [
-                {
-                  "$ref": "#/$defs/num"
-                },
-                {
-                  "type": "array",
-                  "minItems": 1,
-                  "maxItems": 1,
-                  "items": {
-                    "$ref": "#/$defs/num"
-                  }
-                }
+                { "$ref": "#/$defs/num" },
+                { "type": "array", "minItems": 1, "maxItems": 1, "items": { "$ref": "#/$defs/num" } }
               ]
             },
             "to_c": {
+              "description": "Ratio of physical light speed to normalized light speed (cv): to_c = c_phys / cv.",
               "oneOf": [
-                {
-                  "$ref": "#/$defs/num"
-                },
-                {
-                  "type": "array",
-                  "minItems": 1,
-                  "maxItems": 1,
-                  "items": {
-                    "$ref": "#/$defs/num"
-                  }
-                }
+                { "$ref": "#/$defs/num" },
+                { "type": "array", "minItems": 1, "maxItems": 1, "items": { "$ref": "#/$defs/num" } }
               ]
             }
           }
@@ -215,319 +203,363 @@
     },
     "real_group": {
       "type": "object",
+      "description": "Physical constants for the preprocessor (preinp). Values here are not read by the solver directly.",
       "additionalProperties": true,
       "properties": {
-        "deltax": { "$ref": "#/$defs/num" },
-        "deltat": { "$ref": "#/$defs/num" },
-        "massratio": { "$ref": "#/$defs/num" },
-        "density": { "$ref": "#/$defs/num" },
-        "etemp": { "$ref": "#/$defs/num" },
-        "itemp": { "$ref": "#/$defs/num" },
-        "phtemp": { "$ref": "#/$defs/num" },
-        "flowvx": { "$ref": "#/$defs/num" },
-        "flowvy": { "$ref": "#/$defs/num" },
-        "flowvz": { "$ref": "#/$defs/num" },
-        "magb": { "$ref": "#/$defs/num" },
-        "jph": { "$ref": "#/$defs/num" }
+        "deltax": { "$ref": "#/$defs/num", "description": "Grid spacing [m]." },
+        "deltat": { "$ref": "#/$defs/num", "description": "Time step [s]." },
+        "massratio": { "$ref": "#/$defs/num", "description": "Ion-to-electron mass ratio." },
+        "density": { "$ref": "#/$defs/num", "description": "Plasma number density [m^-3]." },
+        "etemp": { "$ref": "#/$defs/num", "description": "Electron temperature [eV]." },
+        "itemp": { "$ref": "#/$defs/num", "description": "Ion temperature [eV]." },
+        "phtemp": { "$ref": "#/$defs/num", "description": "Photoelectron temperature [eV]." },
+        "flowvx": { "$ref": "#/$defs/num", "description": "Bulk flow velocity x-component [m/s]." },
+        "flowvy": { "$ref": "#/$defs/num", "description": "Bulk flow velocity y-component [m/s]." },
+        "flowvz": { "$ref": "#/$defs/num", "description": "Bulk flow velocity z-component [m/s]." },
+        "magb": { "$ref": "#/$defs/num", "description": "Background magnetic field magnitude [T]." },
+        "jph": { "$ref": "#/$defs/num", "description": "Photoemission current density [A/m^2]." }
       }
     },
     "realcv_group": {
       "type": "object",
+      "description": "Derived conversion values for the preprocessor.",
       "additionalProperties": true,
       "properties": {
-        "cvsim": { "$ref": "#/$defs/num" },
-        "weightph": { "$ref": "#/$defs/num" }
+        "cvsim": { "$ref": "#/$defs/num", "description": "Normalized light speed used in the simulation." },
+        "weightph": { "$ref": "#/$defs/num", "description": "Photoelectron statistical weight." }
       }
     },
     "esorem_group": {
       "type": "object",
+      "description": "Electromagnetic/electrostatic solver mode.",
       "additionalProperties": true,
       "properties": {
         "emflag": {
           "type": "integer",
-          "enum": [0, 1, 2]
+          "enum": [0, 1, 2],
+          "description": "Field solver mode. 0 = Electrostatic (Poisson), 1 = Full electromagnetic (Maxwell), 2 = CoToCoA."
         },
-        "nflag_testp": { "$ref": "#/$defs/int" }
+        "nflag_testp": { "$ref": "#/$defs/int", "description": "Test particle flag." }
       }
     },
     "jobcon_group": {
       "type": "object",
+      "description": "Job execution control: restart, snapshot, and step count.",
       "additionalProperties": true,
       "properties": {
-        "jobnum": { "$ref": "#/$defs/int_array" },
-        "nstep": { "$ref": "#/$defs/int" },
-        "lstep": { "$ref": "#/$defs/int" },
-        "maxt": { "$ref": "#/$defs/int" },
-        "random_seed": { "$ref": "#/$defs/int" }
+        "jobnum": { "$ref": "#/$defs/int_array", "description": "[restart_flag, snapshot_flag]. restart_flag: 0=new, 1=restart from SNAPSHOT0. snapshot_flag: 0=no output, 1=save to SNAPSHOT1." },
+        "nstep": { "$ref": "#/$defs/int", "description": "Total number of time steps." },
+        "lstep": { "$ref": "#/$defs/int", "description": "Last step (alternative to nstep)." },
+        "maxt": { "$ref": "#/$defs/int", "description": "Maximum wall-clock time [s]." },
+        "random_seed": { "$ref": "#/$defs/int", "description": "Random number generator seed." }
       }
     },
     "digcon_group": {
       "type": "object",
+      "description": "Diagnostic output frequency, range, and format for HDF5 dumps, field maps, and current density.",
       "additionalProperties": true,
       "properties": {
-        "i1hdf": { "$ref": "#/$defs/int" },
-        "i2hdf": { "$ref": "#/$defs/int" },
-        "i3hdf": { "$ref": "#/$defs/int" },
-        "hdfdigstart": { "$ref": "#/$defs/int" },
-        "hdfdigend": { "$ref": "#/$defs/int" },
-        "ifdiag": { "$ref": "#/$defs/int" },
-        "ijdiag": { "$ref": "#/$defs/int" },
-        "iediag": { "$ref": "#/$defs/int" },
-        "iddiag": { "$ref": "#/$defs/int" },
-        "isdiag": { "$ref": "#/$defs/int" },
-        "iadiag": { "$ref": "#/$defs/int" },
-        "intfoc": { "$ref": "#/$defs/int" },
-        "itchck": { "$ref": "#/$defs/int" },
-        "daverg": { "$ref": "#/$defs/int" },
-        "ipahdf": { "$ref": "#/$defs/int_array" },
-        "ipadig": { "$ref": "#/$defs/int_array" },
-        "ipaxyz": { "$ref": "#/$defs/int_value" },
-        "ifxyz": { "$ref": "#/$defs/int_array" },
-        "ijxyz": { "$ref": "#/$defs/int_array" },
-        "nvx": { "$ref": "#/$defs/int" },
-        "nvy": { "$ref": "#/$defs/int" },
-        "nvz": { "$ref": "#/$defs/int" },
-        "ikxmax": { "$ref": "#/$defs/int" },
-        "ikymax": { "$ref": "#/$defs/int" },
-        "ikzmax": { "$ref": "#/$defs/int" },
-        "emarlxt": { "$ref": "#/$defs/int" }
+        "i1hdf": { "$ref": "#/$defs/int", "description": "HDF5 output flag (axis 1)." },
+        "i2hdf": { "$ref": "#/$defs/int", "description": "HDF5 output flag (axis 2)." },
+        "i3hdf": { "$ref": "#/$defs/int", "description": "HDF5 output flag (axis 3)." },
+        "hdfdigstart": { "$ref": "#/$defs/int", "description": "Start time step for HDF5 diagnostic output." },
+        "hdfdigend": { "$ref": "#/$defs/int", "description": "End time step for HDF5 diagnostic output." },
+        "ifdiag": { "$ref": "#/$defs/int", "description": "Field diagnostic output interval [steps]." },
+        "ijdiag": { "$ref": "#/$defs/int", "description": "Current diagnostic output interval [steps]." },
+        "iediag": { "$ref": "#/$defs/int", "description": "Energy diagnostic interval [steps]. Negative excludes damping region." },
+        "iddiag": { "$ref": "#/$defs/int", "description": "Particle distribution diagnostic interval [steps]." },
+        "isdiag": { "$ref": "#/$defs/int", "description": "Sub-diagnostic interval [steps]. Negative disables output." },
+        "iadiag": { "$ref": "#/$defs/int", "description": "Additional diagnostic interval [steps]." },
+        "intfoc": { "$ref": "#/$defs/int", "description": "Main loop diagnostic interval (should be a multiple of mltstp). Default: 128." },
+        "itchck": { "$ref": "#/$defs/int", "description": "Checkpoint interval [steps]." },
+        "daverg": { "$ref": "#/$defs/int", "description": "Time-averaging window for diagnostics." },
+        "ipahdf": { "$ref": "#/$defs/int_array", "description": "Per-species field data skip factor for HDF5 output." },
+        "ipadig": { "$ref": "#/$defs/int_array", "description": "Per-species particle data skip factor." },
+        "ipaxyz": { "$ref": "#/$defs/int_value", "description": "Particle data storage options: [x, y, z, vx, vy, vz, id] per species. 1=store, 0=skip." },
+        "ifxyz": { "$ref": "#/$defs/int_array", "description": "Field data storage options: [ex, ey, ez, bx, by, bz, rho]. 1=store, 0=skip." },
+        "ijxyz": { "$ref": "#/$defs/int_array", "description": "Current data storage: [ajx, ajy, ajz, phi]. 1=store, 0=skip." },
+        "nvx": { "$ref": "#/$defs/int", "description": "Velocity-space bins (x)." },
+        "nvy": { "$ref": "#/$defs/int", "description": "Velocity-space bins (y)." },
+        "nvz": { "$ref": "#/$defs/int", "description": "Velocity-space bins (z)." },
+        "ikxmax": { "$ref": "#/$defs/int", "description": "Maximum k-space index (x) for spectral diagnostics." },
+        "ikymax": { "$ref": "#/$defs/int", "description": "Maximum k-space index (y) for spectral diagnostics." },
+        "ikzmax": { "$ref": "#/$defs/int", "description": "Maximum k-space index (z) for spectral diagnostics." },
+        "emarlxt": { "$ref": "#/$defs/int", "description": "EMA relaxation time for diagnostics." }
       }
     },
     "plasma_group": {
       "type": "object",
+      "description": "Fundamental plasma and field parameters in normalized EMSES units.",
       "additionalProperties": true,
       "properties": {
-        "wp": { "$ref": "#/$defs/num_array" },
-        "wc": { "$ref": "#/$defs/num" },
-        "cv": { "$ref": "#/$defs/num" },
-        "gfactor": { "$ref": "#/$defs/num" },
-        "phixy": { "$ref": "#/$defs/num" },
-        "phiz": { "$ref": "#/$defs/num" },
-        "e0x": { "$ref": "#/$defs/num" },
-        "e0y": { "$ref": "#/$defs/num" },
-        "e0z": { "$ref": "#/$defs/num" },
-        "rho0": { "$ref": "#/$defs/num" },
-        "denmod": { "$ref": "#/$defs/num_array" },
-        "denk": { "$ref": "#/$defs/num_array" },
-        "omegalw": { "$ref": "#/$defs/num_array" }
+        "wp": { "$ref": "#/$defs/num_array", "description": "Plasma frequency per species. Indirectly sets plasma density: wp_s = sqrt(n_s q_s^2 / (eps0 m_s))." },
+        "wc": { "$ref": "#/$defs/num", "description": "Electron cyclotron frequency. Sets background magnetic field strength: wc = e B0 / m_e." },
+        "cv": { "$ref": "#/$defs/num", "description": "Normalized speed of light." },
+        "gfactor": { "$ref": "#/$defs/num", "description": "Implicit solver factor (default: 0.5). Controls weighting between old/new time levels." },
+        "phixy": { "$ref": "#/$defs/num", "description": "Azimuthal angle [deg] of the static magnetic field projected onto the x-y plane." },
+        "phiz": { "$ref": "#/$defs/num", "description": "Elevation angle [deg] of the static magnetic field from the z-axis." },
+        "e0x": { "$ref": "#/$defs/num", "description": "Static background electric field, x-component (default: 0.0)." },
+        "e0y": { "$ref": "#/$defs/num", "description": "Static background electric field, y-component (default: 0.0)." },
+        "e0z": { "$ref": "#/$defs/num", "description": "Static background electric field, z-component (default: 0.0)." },
+        "rho0": { "$ref": "#/$defs/num", "description": "Reference charge density (default: -1.0 = auto). Positive value overrides the neutralizing background." },
+        "denmod": { "$ref": "#/$defs/num_array", "description": "Density modulation amplitude per species." },
+        "denk": { "$ref": "#/$defs/num_array", "description": "Density modulation wave number per species." },
+        "omegalw": { "$ref": "#/$defs/num_array", "description": "Lower-hybrid frequency per species." }
       }
     },
     "tmgrid_group": {
       "type": "object",
+      "description": "Time step and spatial resolution of the simulation domain.",
       "additionalProperties": true,
       "properties": {
-        "dt": { "$ref": "#/$defs/num" },
-        "dtf": { "$ref": "#/$defs/num" },
-        "dr": { "$ref": "#/$defs/num" },
-        "nx": { "$ref": "#/$defs/int" },
-        "ny": { "$ref": "#/$defs/int" },
-        "nz": { "$ref": "#/$defs/int" }
+        "dt": { "$ref": "#/$defs/num", "description": "Time step size. Must satisfy stability constraints (wp*dt < 1, wc*dt < 1, CFL for emflag=1)." },
+        "dtf": { "$ref": "#/$defs/num", "description": "Field update time step (default: same as dt)." },
+        "dr": { "$ref": "#/$defs/num", "description": "Grid spacing. Must be smaller than the local Debye length." },
+        "nx": { "$ref": "#/$defs/int", "description": "Number of grid cells in x." },
+        "ny": { "$ref": "#/$defs/int", "description": "Number of grid cells in y." },
+        "nz": { "$ref": "#/$defs/int", "description": "Number of grid cells in z." }
       }
     },
     "system_group": {
       "type": "object",
+      "description": "System-wide control flags: species count, boundary conditions, and field masking.",
       "additionalProperties": true,
       "properties": {
-        "nspec": { "$ref": "#/$defs/int" },
-        "mltstp": { "$ref": "#/$defs/int" },
-        "mltstpf": { "$ref": "#/$defs/int" },
-        "juncan": { "$ref": "#/$defs/int" },
-        "ionchg": { "$ref": "#/$defs/int" },
-        "nfbnd": { "$ref": "#/$defs/int_array" },
-        "npbnd": { "$ref": "#/$defs/int_value" },
-        "mtd_vbnd": { "$ref": "#/$defs/int_array" },
-        "boundary_conditions": { "$ref": "#/$defs/num_value" },
-        "iphiref": { "$ref": "#/$defs/int_value" },
-        "imask": { "$ref": "#/$defs/int_array" },
-        "separate_accumulated_and_space_charge": { "$ref": "#/$defs/bool" }
+        "nspec": { "$ref": "#/$defs/int", "description": "Number of particle species (e.g. 1=electron, 2=ion, 3=photoelectron)." },
+        "mltstp": { "$ref": "#/$defs/int", "description": "Number of field update loops per particle push (multiple time step). Default: 1." },
+        "mltstpf": { "$ref": "#/$defs/int", "description": "Complementary field update multiplier (default: 1)." },
+        "juncan": { "$ref": "#/$defs/int", "description": "Current cancellation option. 0=none, 1=subtract uniform current, 2=no ES + subtract, -2=no ES only, >=1000=test particle mode." },
+        "ionchg": { "$ref": "#/$defs/int", "description": "Ion charging flag." },
+        "nfbnd": { "$ref": "#/$defs/int_array", "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free, 2=damping." },
+        "npbnd": { "$ref": "#/$defs/int_value", "description": "Particle boundary condition per axis and species. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd." },
+        "mtd_vbnd": { "$ref": "#/$defs/int_array", "description": "Potential boundary condition per axis [x,y,z]. 0=periodic, 1=Dirichlet, 2=Neumann, 3=open/free-space." },
+        "boundary_conditions": { "$ref": "#/$defs/num_value", "description": "Boundary condition values." },
+        "iphiref": { "$ref": "#/$defs/int_value", "description": "Potential reference point indices." },
+        "imask": { "$ref": "#/$defs/int_array", "description": "Field component masking flags [B, E_trans, E_long, J, rho, …]. 1=enabled, 0=masked." },
+        "separate_accumulated_and_space_charge": { "$ref": "#/$defs/bool", "description": "If true, compute surface (accumulated) and space charge contributions separately (default: true)." }
       }
     },
     "intp_group": {
       "type": "object",
+      "description": "Particle species attributes, initial placement, and integration parameters in normalized EMSES units.",
       "additionalProperties": true,
       "properties": {
-        "np": { "$ref": "#/$defs/int_array" },
-        "npin": { "$ref": "#/$defs/int_array" },
-        "qm": { "$ref": "#/$defs/num_array" },
-        "path": { "$ref": "#/$defs/num_array" },
-        "spa": { "$ref": "#/$defs/num_array" },
-        "spe": { "$ref": "#/$defs/num_array" },
-        "speth": { "$ref": "#/$defs/num_array" },
-        "peth": { "$ref": "#/$defs/num_array" },
-        "f": { "$ref": "#/$defs/num_array" },
-        "vdx": { "$ref": "#/$defs/num_array" },
-        "vdy": { "$ref": "#/$defs/num_array" },
-        "vdz": { "$ref": "#/$defs/num_array" },
-        "vpa": { "$ref": "#/$defs/num_array" },
-        "vpb": { "$ref": "#/$defs/num_array" },
-        "vpe": { "$ref": "#/$defs/num_array" },
-        "nphi": { "$ref": "#/$defs/int_array" },
-        "ndst": { "$ref": "#/$defs/int_array" },
-        "ioptd": { "$ref": "#/$defs/int_array" },
-        "vdri": { "$ref": "#/$defs/num_array" },
-        "vdthz": { "$ref": "#/$defs/num_array" },
-        "vdthxy": { "$ref": "#/$defs/num_array" },
-        "lcgamma": { "$ref": "#/$defs/num_array" },
-        "lcbeta": { "$ref": "#/$defs/num_array" },
-        "dnsf": { "$ref": "#/$defs/int_array" }
+        "np": { "$ref": "#/$defs/int_array", "description": "Particle buffer size per species. Increase if buffer overflow occurs during emission/injection." },
+        "npin": { "$ref": "#/$defs/int_array", "description": "Initial macro-particle count per species at startup. Mutually exclusive with dnsf." },
+        "qm": { "$ref": "#/$defs/num_array", "description": "Charge-to-mass ratio per species (electron = -1.0)." },
+        "path": { "$ref": "#/$defs/num_array", "description": "Parallel thermal velocity per species (parallel to B0)." },
+        "spa": { "$ref": "#/$defs/num_array", "description": "Parallel drift velocity in the distribution function (default: 0.0)." },
+        "spe": { "$ref": "#/$defs/num_array", "description": "Perpendicular drift velocity per species (default: 0.0)." },
+        "speth": { "$ref": "#/$defs/num_array", "description": "Direction angle of perpendicular drift [deg] (default: 0.0)." },
+        "peth": { "$ref": "#/$defs/num_array", "description": "Perpendicular thermal velocity per species (perpendicular to B0)." },
+        "f": { "$ref": "#/$defs/num_array", "description": "Loss-cone factor (default: 1.0). f=1 with peth=path gives isotropic. 0<f<1 gives loss-cone distribution." },
+        "vdx": { "$ref": "#/$defs/num_array", "description": "Drift velocity x-component per species (Cartesian alternative to vdri/vdthz/vdthxy)." },
+        "vdy": { "$ref": "#/$defs/num_array", "description": "Drift velocity y-component per species." },
+        "vdz": { "$ref": "#/$defs/num_array", "description": "Drift velocity z-component per species." },
+        "vpa": { "$ref": "#/$defs/num_array", "description": "Minimum of parallel velocity distribution range (default: -16.0)." },
+        "vpb": { "$ref": "#/$defs/num_array", "description": "Maximum of parallel velocity distribution range (default: 16.0)." },
+        "vpe": { "$ref": "#/$defs/num_array", "description": "Maximum of perpendicular velocity distribution range (default: 32.0)." },
+        "nphi": { "$ref": "#/$defs/int_array", "description": "Number of azimuthal bins for velocity distribution diagnostics." },
+        "ndst": { "$ref": "#/$defs/int_array", "description": "Distribution type per species." },
+        "ioptd": { "$ref": "#/$defs/int_array", "description": "Particle placement optimization flag per species." },
+        "vdri": { "$ref": "#/$defs/num_array", "description": "Bulk drift velocity magnitude per species." },
+        "vdthz": { "$ref": "#/$defs/num_array", "description": "Drift direction zenith angle [deg] per species (0° = +z)." },
+        "vdthxy": { "$ref": "#/$defs/num_array", "description": "Drift direction azimuthal angle [deg] per species (from +x, CCW)." },
+        "lcgamma": { "$ref": "#/$defs/num_array", "description": "Loss-cone gamma parameter per species." },
+        "lcbeta": { "$ref": "#/$defs/num_array", "description": "Loss-cone beta parameter per species." },
+        "dnsf": { "$ref": "#/$defs/int_array", "description": "Particle density scaling factor. Sets how many physical particles are grouped into one macro-particle. Mutually exclusive with npin." }
       }
     },
     "others_group": {
       "type": "object",
+      "description": "Miscellaneous parameters.",
       "additionalProperties": true,
       "properties": {
-        "tcs": { "$ref": "#/$defs/num" },
-        "cs": { "$ref": "#/$defs/num" }
+        "tcs": { "$ref": "#/$defs/num", "description": "Time constant parameter." },
+        "cs": { "$ref": "#/$defs/num", "description": "Sound speed parameter." }
       }
     },
     "inp_group": {
       "type": "object",
+      "description": "Particle injection from simulation domain boundaries.",
       "additionalProperties": true,
       "properties": {
-        "inpf": { "$ref": "#/$defs/int_array" },
-        "inpb": { "$ref": "#/$defs/int_array" },
-        "injct": { "$ref": "#/$defs/int_array" },
-        "npr": { "$ref": "#/$defs/int_array" }
+        "inpf": { "$ref": "#/$defs/int_array", "description": "Injection flag at lower x-boundary per species. 0=no injection, 1=inject." },
+        "inpb": { "$ref": "#/$defs/int_array", "description": "Injection flag at upper x-boundary per species. 0=no injection, 1=inject." },
+        "injct": { "$ref": "#/$defs/int_array", "description": "Time step interval between continuous injections per species. 0=disable periodic injection." },
+        "npr": { "$ref": "#/$defs/int_array", "description": "Number of standard-distribution samples for injection particle generation." }
       }
     },
     "ptcond_group": {
       "type": "object",
+      "description": "Surface, conductor, and inner boundary settings: geometry, potential, subcell, and secondary electron emission.",
       "additionalProperties": true,
       "properties": {
-        "boundary_type": { "$ref": "#/$defs/str" },
-        "boundary_types": { "$ref": "#/$defs/str_array" },
-        "zssurf": { "$ref": "#/$defs/num" },
-        "zsbuf": { "$ref": "#/$defs/num" },
-        "rcurv": { "$ref": "#/$defs/num" },
-        "xlrechole": { "$ref": "#/$defs/num_array" },
-        "xurechole": { "$ref": "#/$defs/num_array" },
-        "ylrechole": { "$ref": "#/$defs/num_array" },
-        "yurechole": { "$ref": "#/$defs/num_array" },
-        "zlrechole": { "$ref": "#/$defs/num_array" },
-        "zurechole": { "$ref": "#/$defs/num_array" },
-        "rectangle_shape": { "$ref": "#/$defs/num_matrix" },
-        "circle_origin": { "$ref": "#/$defs/num_matrix" },
-        "circle_radius": { "$ref": "#/$defs/num_array" },
-        "cuboid_shape": { "$ref": "#/$defs/num_matrix" },
-        "sphere_origin": { "$ref": "#/$defs/num_matrix" },
-        "sphere_radius": { "$ref": "#/$defs/num_array" },
-        "cylinder_origin": { "$ref": "#/$defs/num_matrix" },
-        "cylinder_radius": { "$ref": "#/$defs/num_array" },
-        "cylinder_height": { "$ref": "#/$defs/num_array" },
-        "disk_origin": { "$ref": "#/$defs/num_matrix" },
-        "disk_height": { "$ref": "#/$defs/num_array" },
-        "disk_radius": { "$ref": "#/$defs/num_array" },
-        "disk_inner_radius": { "$ref": "#/$defs/num_array" },
-        "npc": { "$ref": "#/$defs/int" },
-        "npcg": { "$ref": "#/$defs/int" },
-        "pcgs": { "$ref": "#/$defs/int_array" },
-        "ccgs": { "$ref": "#/$defs/int_array" },
-        "mtd_vchg": { "$ref": "#/$defs/int_array" },
-        "modeww": { "$ref": "#/$defs/int" },
-        "conductivity": { "$ref": "#/$defs/num_array" },
-        "boundary_conductor_id": { "$ref": "#/$defs/int_array" },
-        "max_bounce_count": { "$ref": "#/$defs/int_array" },
-        "enable_secondary_electron_emission": { "$ref": "#/$defs/bool_array" },
-        "boundary_se_model_type": { "$ref": "#/$defs/int_array" },
-        "boundary_se_const_yield": { "$ref": "#/$defs/num_array" },
-        "boundary_se_yield_max": { "$ref": "#/$defs/num_array" },
-        "boundary_se_energy_max": { "$ref": "#/$defs/num_array" },
-        "boundary_se_species_id": { "$ref": "#/$defs/int_array" }
+        "boundary_type": {
+          "type": "string",
+          "description": "Single-object inner boundary type. Use 'complex' with boundary_types for multiple sub-boundaries.",
+          "enum": ["none", "flat-surface", "rectangle-hole", "dent-rectangle-hole", "cylinder-hole", "hyperboloid-hole", "ellipsoid-hole", "complex"]
+        },
+        "boundary_types": {
+          "type": "array",
+          "description": "Sub-boundary type list for complex mode.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "rectangle", "circlex", "circley", "circlez",
+              "cuboid", "sphere",
+              "cylinderx", "cylindery", "cylinderz",
+              "open-cylinderx", "open-cylindery", "open-cylinderz",
+              "diskx", "disky", "diskz",
+              "plane-with-circlex", "plane-with-circley", "plane-with-circlez"
+            ]
+          }
+        },
+        "zssurf": { "$ref": "#/$defs/num", "description": "Z-coordinate of the ground surface [grid units] (for *-surface and *-hole types)." },
+        "zsbuf": { "$ref": "#/$defs/num", "description": "Buffer zone above zssurf where particles are not initially placed." },
+        "rcurv": { "$ref": "#/$defs/num", "description": "Curvature ratio: minimum-to-maximum radius (for hyperboloid-hole, ellipsoid-hole, dent-rectangle-hole)." },
+        "xlrechole": { "$ref": "#/$defs/num_array", "description": "X lower boundary of rectangular hole [grid units]." },
+        "xurechole": { "$ref": "#/$defs/num_array", "description": "X upper boundary of rectangular hole [grid units]." },
+        "ylrechole": { "$ref": "#/$defs/num_array", "description": "Y lower boundary of rectangular hole [grid units]." },
+        "yurechole": { "$ref": "#/$defs/num_array", "description": "Y upper boundary of rectangular hole [grid units]." },
+        "zlrechole": { "$ref": "#/$defs/num_array", "description": "Z lower boundary of rectangular hole [grid units]." },
+        "zurechole": { "$ref": "#/$defs/num_array", "description": "Z upper boundary of rectangular hole [grid units]." },
+        "rectangle_shape": { "$ref": "#/$defs/num_matrix", "description": "Rectangular plane extents: [xmin, xmax, ymin, ymax, zmin, zmax] per sub-boundary." },
+        "circle_origin": { "$ref": "#/$defs/num_matrix", "description": "Circle center coordinates [x, y, z] per sub-boundary." },
+        "circle_radius": { "$ref": "#/$defs/num_array", "description": "Circle radius per sub-boundary." },
+        "cuboid_shape": { "$ref": "#/$defs/num_matrix", "description": "Cuboid extents: [xmin, xmax, ymin, ymax, zmin, zmax] per sub-boundary." },
+        "sphere_origin": { "$ref": "#/$defs/num_matrix", "description": "Sphere center coordinates [x, y, z] per sub-boundary." },
+        "sphere_radius": { "$ref": "#/$defs/num_array", "description": "Sphere radius per sub-boundary." },
+        "cylinder_origin": { "$ref": "#/$defs/num_matrix", "description": "Cylinder bottom-center coordinates [x, y, z] per sub-boundary." },
+        "cylinder_radius": { "$ref": "#/$defs/num_array", "description": "Cylinder radius per sub-boundary." },
+        "cylinder_height": { "$ref": "#/$defs/num_array", "description": "Cylinder height along its axis per sub-boundary." },
+        "disk_origin": { "$ref": "#/$defs/num_matrix", "description": "Annular disk bottom-center coordinates [x, y, z] per sub-boundary." },
+        "disk_height": { "$ref": "#/$defs/num_array", "description": "Annular disk thickness (height) per sub-boundary." },
+        "disk_radius": { "$ref": "#/$defs/num_array", "description": "Annular disk outer radius per sub-boundary." },
+        "disk_inner_radius": { "$ref": "#/$defs/num_array", "description": "Annular disk inner radius per sub-boundary." },
+        "npc": { "$ref": "#/$defs/int", "description": "Number of solid objects." },
+        "npcg": { "$ref": "#/$defs/int", "description": "Number of conductor groups." },
+        "pcgs": { "$ref": "#/$defs/int_array", "description": "Conductor group assignment per object." },
+        "ccgs": { "$ref": "#/$defs/int_array", "description": "Conductor coupling index per object." },
+        "mtd_vchg": { "$ref": "#/$defs/int_array", "description": "Potential treatment per object. 0=floating (self-consistent), -1=fixed (held at pfixed)." },
+        "modeww": { "$ref": "#/$defs/int", "description": "Capacitance matrix mode. |modeww|=1: no cap. matrix, |modeww|=2: use cap. matrix. Sign: >0 ignore charge accumulation, <0 include it." },
+        "conductivity": { "$ref": "#/$defs/num_array", "description": "Surface conductivity per sub-boundary." },
+        "boundary_conductor_id": { "$ref": "#/$defs/int_array", "description": "Conductor ID (ipc) associated with each sub-boundary for charge accounting." },
+        "max_bounce_count": { "$ref": "#/$defs/int_array", "description": "Maximum number of surface bounces per boundary before absorption." },
+        "enable_secondary_electron_emission": { "$ref": "#/$defs/bool_array", "description": "Enable secondary electron emission (SEE) per boundary and species." },
+        "boundary_se_model_type": { "$ref": "#/$defs/int_array", "description": "SEE yield model type. 0=Whipple (1981) empirical model (energy and angle dependent)." },
+        "boundary_se_const_yield": { "$ref": "#/$defs/num_array", "description": "Constant SEE yield (used when const-yield model is selected)." },
+        "boundary_se_yield_max": { "$ref": "#/$defs/num_array", "description": "Maximum SEE yield delta_max at optimal energy." },
+        "boundary_se_energy_max": { "$ref": "#/$defs/num_array", "description": "Incident energy E_max [EMSES eV] at which yield = delta_max." },
+        "boundary_se_species_id": { "$ref": "#/$defs/int_array", "description": "Species ID for emitted secondary electrons (default: 1 = electron)." }
       }
     },
     "wave_group": {
       "type": "object",
+      "description": "Wave excitation parameters.",
       "additionalProperties": true
     },
     "scrnt_group": {
       "type": "object",
+      "description": "Screen current diagnostics.",
       "additionalProperties": true
     },
     "jsrc_group": {
       "type": "object",
+      "description": "Local oscillating current sources injecting prescribed sinusoidal current density at specific grid points.",
       "additionalProperties": true
     },
     "testch_group": {
       "type": "object",
+      "description": "Static or distributed test charges that contribute to the potential but are not moved by fields.",
       "additionalProperties": true
     },
     "dipole_group": {
       "type": "object",
+      "description": "Embedded magnetic dipole sources for introducing localized magnetic fields.",
       "additionalProperties": true
     },
     "emissn_group": {
       "type": "object",
+      "description": "Charged particle emission from internal or external surfaces (e.g. photoelectrons, secondary electrons).",
       "additionalProperties": true,
       "properties": {
-        "decrease_current_according_to_incident_angle": { "$ref": "#/$defs/bool" },
-        "nflag_emit": { "$ref": "#/$defs/int_array" },
-        "nepl": { "$ref": "#/$defs/int_array" },
-        "flpf": { "$ref": "#/$defs/int_array" },
-        "flpb": { "$ref": "#/$defs/int_array" },
-        "curf": { "$ref": "#/$defs/num_array" },
-        "curb": { "$ref": "#/$defs/num_array" },
-        "qp": { "$ref": "#/$defs/num_array" },
-        "qpr": { "$ref": "#/$defs/num_array" },
-        "abvdem": { "$ref": "#/$defs/num_array" },
-        "dnsf": { "$ref": "#/$defs/int_array" },
-        "dnsb": { "$ref": "#/$defs/int_array" },
-        "imarea": { "$ref": "#/$defs/num_array" },
-        "ipcpl": { "$ref": "#/$defs/int_array" },
-        "nemd": { "$ref": "#/$defs/int_array" },
-        "omniemit": { "$ref": "#/$defs/int" },
-        "remf": { "$ref": "#/$defs/num_array" },
-        "remb": { "$ref": "#/$defs/num_array" },
-        "xmaxe": { "$ref": "#/$defs/num_array" },
-        "xmine": { "$ref": "#/$defs/num_array" },
-        "ymaxe": { "$ref": "#/$defs/num_array" },
-        "ymine": { "$ref": "#/$defs/num_array" },
-        "zmaxe": { "$ref": "#/$defs/num_array" },
-        "zmine": { "$ref": "#/$defs/num_array" },
-        "peject": { "$ref": "#/$defs/num" },
-        "thetaz": { "$ref": "#/$defs/num" },
-        "thetaxy": { "$ref": "#/$defs/num" },
-        "plreloc": { "$ref": "#/$defs/num" },
-        "mainprop": { "$ref": "#/$defs/num" },
-        "pe_ray_cast": { "$ref": "#/$defs/bool" },
-        "ray_zenith_angle_deg": { "$ref": "#/$defs/num" },
-        "ray_azimuth_angle_deg": { "$ref": "#/$defs/num" },
-        "periodic_raycast": { "$ref": "#/$defs/bool" },
-        "max_periodic_shift": { "$ref": "#/$defs/int" },
-        "max_boundary_height": { "$ref": "#/$defs/num" },
-        "emission_time_mode": { "$ref": "#/$defs/int" },
-        "emission_start_step": { "$ref": "#/$defs/int" },
-        "emission_end_step": { "$ref": "#/$defs/int" },
-        "emission_time_sigma": { "$ref": "#/$defs/num" },
-        "emission_leave_anti_particle": { "$ref": "#/$defs/bool" }
+        "decrease_current_according_to_incident_angle": { "$ref": "#/$defs/bool", "description": "If true, reduce emission current by cos(incidence angle)." },
+        "nflag_emit": { "$ref": "#/$defs/int_array", "description": "Emission type per species. 0=external (domain boundary), 1=internal (inner surface), 2=internal with ray-casting." },
+        "nepl": { "$ref": "#/$defs/int_array", "description": "Number of emission planes per species." },
+        "flpf": { "$ref": "#/$defs/int_array", "description": "Forward emission plane flag." },
+        "flpb": { "$ref": "#/$defs/int_array", "description": "Backward emission plane flag." },
+        "curf": { "$ref": "#/$defs/num_array", "description": "Base emission current density per species [A/m^2 in EMSES units]." },
+        "curb": { "$ref": "#/$defs/num_array", "description": "Backward emission current density per species." },
+        "qp": { "$ref": "#/$defs/num_array", "description": "Emission charge parameter per species." },
+        "qpr": { "$ref": "#/$defs/num_array", "description": "Reverse emission charge parameter per species." },
+        "abvdem": { "$ref": "#/$defs/num_array", "description": "Above-surface emission distance parameter." },
+        "dnsf": { "$ref": "#/$defs/int_array", "description": "Macro-particle division count for emitted particles." },
+        "dnsb": { "$ref": "#/$defs/int_array", "description": "Backward macro-particle division count." },
+        "imarea": { "$ref": "#/$defs/num_array", "description": "Emission area parameter." },
+        "ipcpl": { "$ref": "#/$defs/int_array", "description": "Conductor ID coupled to each emission plane for charge conservation." },
+        "nemd": { "$ref": "#/$defs/int_array", "description": "Emission direction per plane: ±1=x, ±2=y, ±3=z normal. Sign sets positive/negative direction." },
+        "omniemit": { "$ref": "#/$defs/int", "description": "Omni-directional emission flag." },
+        "remf": { "$ref": "#/$defs/num_array", "description": "Forward emission rate modifier." },
+        "remb": { "$ref": "#/$defs/num_array", "description": "Backward emission rate modifier." },
+        "xmaxe": { "$ref": "#/$defs/num_array", "description": "Upper x-boundary of emission plane [grid units]." },
+        "xmine": { "$ref": "#/$defs/num_array", "description": "Lower x-boundary of emission plane [grid units]." },
+        "ymaxe": { "$ref": "#/$defs/num_array", "description": "Upper y-boundary of emission plane [grid units]." },
+        "ymine": { "$ref": "#/$defs/num_array", "description": "Lower y-boundary of emission plane [grid units]." },
+        "zmaxe": { "$ref": "#/$defs/num_array", "description": "Upper z-boundary of emission plane [grid units]." },
+        "zmine": { "$ref": "#/$defs/num_array", "description": "Lower z-boundary of emission plane [grid units]." },
+        "peject": { "$ref": "#/$defs/num", "description": "Ejection energy parameter." },
+        "thetaz": { "$ref": "#/$defs/num", "description": "Emission zenith angle [deg]." },
+        "thetaxy": { "$ref": "#/$defs/num", "description": "Emission azimuthal angle [deg]." },
+        "plreloc": { "$ref": "#/$defs/num", "description": "Particle relocation distance after emission." },
+        "mainprop": { "$ref": "#/$defs/num", "description": "Main propagation parameter." },
+        "pe_ray_cast": { "$ref": "#/$defs/bool", "description": "Enable ray-casting based photoemission. Surface exposure to illumination determines emission area." },
+        "ray_zenith_angle_deg": { "$ref": "#/$defs/num", "description": "Solar zenith angle [deg] for ray-casting." },
+        "ray_azimuth_angle_deg": { "$ref": "#/$defs/num", "description": "Solar azimuth angle [deg] for ray-casting." },
+        "periodic_raycast": { "$ref": "#/$defs/bool", "description": "Enable periodic ray-casting (replicate objects in xy-plane for periodic shadows)." },
+        "max_periodic_shift": { "$ref": "#/$defs/int", "description": "Maximum horizontal shift for periodic ray-casting replication." },
+        "max_boundary_height": { "$ref": "#/$defs/num", "description": "Maximum vertical height for estimating periodic ray-casting replication count." },
+        "emission_time_mode": { "$ref": "#/$defs/int", "description": "Emission time variation mode. 0=constant, 1=Gaussian." },
+        "emission_start_step": { "$ref": "#/$defs/int", "description": "Time step to start particle emission." },
+        "emission_end_step": { "$ref": "#/$defs/int", "description": "Time step to stop particle emission." },
+        "emission_time_sigma": { "$ref": "#/$defs/num", "description": "Standard deviation for Gaussian emission time variation." },
+        "emission_leave_anti_particle": { "$ref": "#/$defs/bool", "description": "If true, leave an anti-particle at the emission site to maintain charge neutrality (default: true)." }
       }
     },
     "mpi_group": {
       "type": "object",
+      "description": "MPI domain decomposition.",
       "additionalProperties": true,
       "properties": {
-        "nodes": { "$ref": "#/$defs/int_array" }
+        "nodes": { "$ref": "#/$defs/int_array", "description": "Number of MPI process divisions along [x, y, z]. Total processes = nodes[0] * nodes[1] * nodes[2]." }
       }
     },
     "verbose_group": {
       "type": "object",
+      "description": "Verbosity and debug output levels during simulation execution.",
       "additionalProperties": true,
       "properties": {
-        "EMSES_verbose": { "$ref": "#/$defs/int" },
-        "OHHELP_verbose": { "$ref": "#/$defs/int" },
-        "OHHELP_stats": { "$ref": "#/$defs/int" },
-        "OHHELP_repiter": { "$ref": "#/$defs/int" }
+        "EMSES_verbose": { "$ref": "#/$defs/int", "description": "Main EMSES simulation verbosity level (default: 0). Higher values produce more output." },
+        "OHHELP_verbose": { "$ref": "#/$defs/int", "description": "OHHELP (Poisson solver) library verbosity level (default: 0)." },
+        "OHHELP_stats": { "$ref": "#/$defs/int", "description": "If non-zero, print OHHELP solver performance statistics." },
+        "OHHELP_repiter": { "$ref": "#/$defs/int", "description": "If non-zero, report OHHELP solver iteration counts." }
       }
     },
     "gradema_group": {
       "type": "object",
+      "description": "Surface charging acceleration (EMA-based gradient method) for faster convergence of surface potential.",
       "additionalProperties": true,
       "properties": {
-        "coef_start": { "$ref": "#/$defs/num_value" },
-        "smooth_coef": { "$ref": "#/$defs/num_value" },
-        "grad_coef": { "$ref": "#/$defs/num_value" },
-        "grad_coef2": { "$ref": "#/$defs/num_value" },
-        "grad_type": { "$ref": "#/$defs/str" },
-        "control_grad_coef": { "$ref": "#/$defs/num_matrix" }
+        "coef_start": { "$ref": "#/$defs/num_value", "description": "Time-fraction thresholds (relative to nstep) selecting which grad_coef/smooth_coef segment to use." },
+        "smooth_coef": { "$ref": "#/$defs/num_value", "description": "EMA smoothing coefficient: EMA(t) = (1 - smooth_coef)*EMA(t-1) + smooth_coef*drhobk(t)." },
+        "grad_coef": { "$ref": "#/$defs/num_value", "description": "Charging acceleration coefficient: rhobk(t) = rhobk(t-1) + grad_coef * EMA(t). Default: 1.0." },
+        "grad_coef2": { "$ref": "#/$defs/num_value", "description": "Secondary gradient coefficient for 'linear' and 'bezier' grad_type modes." },
+        "grad_type": {
+          "type": "string",
+          "description": "Gradient mode for spatial variation of charging acceleration.",
+          "enum": ["constant", "linear", "bezier"]
+        },
+        "control_grad_coef": { "$ref": "#/$defs/num_matrix", "description": "Control points for spatially-varying gradient coefficient." }
       }
     }
   }

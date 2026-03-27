@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MPIEMSES3D plasma.toml",
+  "description": "Initial JSON Schema for MPIEMSES3D TOML input. Top-level groups are strict; individual groups intentionally allow additional properties so the schema can be extended incrementally without blocking existing cases.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional editor schema hint. Ignored by MPIEMSES3D."
+    },
+    "meta": {
+      "$ref": "#/$defs/meta_group"
+    },
+    "real": {
+      "$ref": "#/$defs/real_group"
+    },
+    "realcv": {
+      "$ref": "#/$defs/realcv_group"
+    },
+    "esorem": {
+      "$ref": "#/$defs/esorem_group"
+    },
+    "jobcon": {
+      "$ref": "#/$defs/jobcon_group"
+    },
+    "digcon": {
+      "$ref": "#/$defs/digcon_group"
+    },
+    "plasma": {
+      "$ref": "#/$defs/plasma_group"
+    },
+    "tmgrid": {
+      "$ref": "#/$defs/tmgrid_group"
+    },
+    "system": {
+      "$ref": "#/$defs/system_group"
+    },
+    "intp": {
+      "$ref": "#/$defs/intp_group"
+    },
+    "others": {
+      "$ref": "#/$defs/others_group"
+    },
+    "inp": {
+      "$ref": "#/$defs/inp_group"
+    },
+    "ptcond": {
+      "$ref": "#/$defs/ptcond_group"
+    },
+    "wave": {
+      "$ref": "#/$defs/wave_group"
+    },
+    "scrnt": {
+      "$ref": "#/$defs/scrnt_group"
+    },
+    "jsrc": {
+      "$ref": "#/$defs/jsrc_group"
+    },
+    "testch": {
+      "$ref": "#/$defs/testch_group"
+    },
+    "dipole": {
+      "$ref": "#/$defs/dipole_group"
+    },
+    "emissn": {
+      "$ref": "#/$defs/emissn_group"
+    },
+    "mpi": {
+      "$ref": "#/$defs/mpi_group"
+    },
+    "verbose": {
+      "$ref": "#/$defs/verbose_group"
+    },
+    "gradema": {
+      "$ref": "#/$defs/gradema_group"
+    }
+  },
+  "$defs": {
+    "int": {
+      "type": "integer"
+    },
+    "num": {
+      "type": "number"
+    },
+    "bool": {
+      "type": "boolean"
+    },
+    "str": {
+      "type": "string"
+    },
+    "int_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/int"
+      }
+    },
+    "num_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/num"
+      }
+    },
+    "bool_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bool"
+      }
+    },
+    "str_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/str"
+      }
+    },
+    "int_matrix": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/int_array"
+      }
+    },
+    "num_matrix": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/num_array"
+      }
+    },
+    "num_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/num"
+        },
+        {
+          "$ref": "#/$defs/num_array"
+        },
+        {
+          "$ref": "#/$defs/num_matrix"
+        }
+      ]
+    },
+    "int_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/int"
+        },
+        {
+          "$ref": "#/$defs/int_array"
+        },
+        {
+          "$ref": "#/$defs/int_matrix"
+        }
+      ]
+    },
+    "bool_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/bool"
+        },
+        {
+          "$ref": "#/$defs/bool_array"
+        }
+      ]
+    },
+    "str_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/str"
+        },
+        {
+          "$ref": "#/$defs/str_array"
+        }
+      ]
+    },
+    "meta_group": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit_conversion": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dx": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/num"
+                },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/num"
+                  }
+                }
+              ]
+            },
+            "to_c": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/num"
+                },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/num"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "real_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "deltax": { "$ref": "#/$defs/num" },
+        "deltat": { "$ref": "#/$defs/num" },
+        "massratio": { "$ref": "#/$defs/num" },
+        "density": { "$ref": "#/$defs/num" },
+        "etemp": { "$ref": "#/$defs/num" },
+        "itemp": { "$ref": "#/$defs/num" },
+        "phtemp": { "$ref": "#/$defs/num" },
+        "flowvx": { "$ref": "#/$defs/num" },
+        "flowvy": { "$ref": "#/$defs/num" },
+        "flowvz": { "$ref": "#/$defs/num" },
+        "magb": { "$ref": "#/$defs/num" },
+        "jph": { "$ref": "#/$defs/num" }
+      }
+    },
+    "realcv_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "cvsim": { "$ref": "#/$defs/num" },
+        "weightph": { "$ref": "#/$defs/num" }
+      }
+    },
+    "esorem_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "emflag": {
+          "type": "integer",
+          "enum": [0, 1, 2]
+        },
+        "nflag_testp": { "$ref": "#/$defs/int" }
+      }
+    },
+    "jobcon_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "jobnum": { "$ref": "#/$defs/int_array" },
+        "nstep": { "$ref": "#/$defs/int" },
+        "lstep": { "$ref": "#/$defs/int" },
+        "maxt": { "$ref": "#/$defs/int" },
+        "random_seed": { "$ref": "#/$defs/int" }
+      }
+    },
+    "digcon_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "i1hdf": { "$ref": "#/$defs/int" },
+        "i2hdf": { "$ref": "#/$defs/int" },
+        "i3hdf": { "$ref": "#/$defs/int" },
+        "hdfdigstart": { "$ref": "#/$defs/int" },
+        "hdfdigend": { "$ref": "#/$defs/int" },
+        "ifdiag": { "$ref": "#/$defs/int" },
+        "ijdiag": { "$ref": "#/$defs/int" },
+        "iediag": { "$ref": "#/$defs/int" },
+        "iddiag": { "$ref": "#/$defs/int" },
+        "isdiag": { "$ref": "#/$defs/int" },
+        "iadiag": { "$ref": "#/$defs/int" },
+        "intfoc": { "$ref": "#/$defs/int" },
+        "itchck": { "$ref": "#/$defs/int" },
+        "daverg": { "$ref": "#/$defs/int" },
+        "ipahdf": { "$ref": "#/$defs/int_array" },
+        "ipadig": { "$ref": "#/$defs/int_array" },
+        "ipaxyz": { "$ref": "#/$defs/int_value" },
+        "ifxyz": { "$ref": "#/$defs/int_array" },
+        "ijxyz": { "$ref": "#/$defs/int_array" },
+        "nvx": { "$ref": "#/$defs/int" },
+        "nvy": { "$ref": "#/$defs/int" },
+        "nvz": { "$ref": "#/$defs/int" },
+        "ikxmax": { "$ref": "#/$defs/int" },
+        "ikymax": { "$ref": "#/$defs/int" },
+        "ikzmax": { "$ref": "#/$defs/int" },
+        "emarlxt": { "$ref": "#/$defs/int" }
+      }
+    },
+    "plasma_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "wp": { "$ref": "#/$defs/num_array" },
+        "wc": { "$ref": "#/$defs/num" },
+        "cv": { "$ref": "#/$defs/num" },
+        "gfactor": { "$ref": "#/$defs/num" },
+        "phixy": { "$ref": "#/$defs/num" },
+        "phiz": { "$ref": "#/$defs/num" },
+        "e0x": { "$ref": "#/$defs/num" },
+        "e0y": { "$ref": "#/$defs/num" },
+        "e0z": { "$ref": "#/$defs/num" },
+        "rho0": { "$ref": "#/$defs/num" },
+        "denmod": { "$ref": "#/$defs/num_array" },
+        "denk": { "$ref": "#/$defs/num_array" },
+        "omegalw": { "$ref": "#/$defs/num_array" }
+      }
+    },
+    "tmgrid_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "dt": { "$ref": "#/$defs/num" },
+        "dtf": { "$ref": "#/$defs/num" },
+        "dr": { "$ref": "#/$defs/num" },
+        "nx": { "$ref": "#/$defs/int" },
+        "ny": { "$ref": "#/$defs/int" },
+        "nz": { "$ref": "#/$defs/int" }
+      }
+    },
+    "system_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "nspec": { "$ref": "#/$defs/int" },
+        "mltstp": { "$ref": "#/$defs/int" },
+        "mltstpf": { "$ref": "#/$defs/int" },
+        "juncan": { "$ref": "#/$defs/int" },
+        "ionchg": { "$ref": "#/$defs/int" },
+        "nfbnd": { "$ref": "#/$defs/int_array" },
+        "npbnd": { "$ref": "#/$defs/int_value" },
+        "mtd_vbnd": { "$ref": "#/$defs/int_array" },
+        "boundary_conditions": { "$ref": "#/$defs/num_value" },
+        "iphiref": { "$ref": "#/$defs/int_value" },
+        "imask": { "$ref": "#/$defs/int_array" },
+        "separate_accumulated_and_space_charge": { "$ref": "#/$defs/bool" }
+      }
+    },
+    "intp_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "np": { "$ref": "#/$defs/int_array" },
+        "npin": { "$ref": "#/$defs/int_array" },
+        "qm": { "$ref": "#/$defs/num_array" },
+        "path": { "$ref": "#/$defs/num_array" },
+        "spa": { "$ref": "#/$defs/num_array" },
+        "spe": { "$ref": "#/$defs/num_array" },
+        "speth": { "$ref": "#/$defs/num_array" },
+        "peth": { "$ref": "#/$defs/num_array" },
+        "f": { "$ref": "#/$defs/num_array" },
+        "vdx": { "$ref": "#/$defs/num_array" },
+        "vdy": { "$ref": "#/$defs/num_array" },
+        "vdz": { "$ref": "#/$defs/num_array" },
+        "vpa": { "$ref": "#/$defs/num_array" },
+        "vpb": { "$ref": "#/$defs/num_array" },
+        "vpe": { "$ref": "#/$defs/num_array" },
+        "nphi": { "$ref": "#/$defs/int_array" },
+        "ndst": { "$ref": "#/$defs/int_array" },
+        "ioptd": { "$ref": "#/$defs/int_array" },
+        "vdri": { "$ref": "#/$defs/num_array" },
+        "vdthz": { "$ref": "#/$defs/num_array" },
+        "vdthxy": { "$ref": "#/$defs/num_array" },
+        "lcgamma": { "$ref": "#/$defs/num_array" },
+        "lcbeta": { "$ref": "#/$defs/num_array" },
+        "dnsf": { "$ref": "#/$defs/int_array" }
+      }
+    },
+    "others_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "tcs": { "$ref": "#/$defs/num" },
+        "cs": { "$ref": "#/$defs/num" }
+      }
+    },
+    "inp_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "inpf": { "$ref": "#/$defs/int_array" },
+        "inpb": { "$ref": "#/$defs/int_array" },
+        "injct": { "$ref": "#/$defs/int_array" },
+        "npr": { "$ref": "#/$defs/int_array" }
+      }
+    },
+    "ptcond_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "boundary_type": { "$ref": "#/$defs/str" },
+        "boundary_types": { "$ref": "#/$defs/str_array" },
+        "zssurf": { "$ref": "#/$defs/num" },
+        "zsbuf": { "$ref": "#/$defs/num" },
+        "rcurv": { "$ref": "#/$defs/num" },
+        "xlrechole": { "$ref": "#/$defs/num_array" },
+        "xurechole": { "$ref": "#/$defs/num_array" },
+        "ylrechole": { "$ref": "#/$defs/num_array" },
+        "yurechole": { "$ref": "#/$defs/num_array" },
+        "zlrechole": { "$ref": "#/$defs/num_array" },
+        "zurechole": { "$ref": "#/$defs/num_array" },
+        "rectangle_shape": { "$ref": "#/$defs/num_matrix" },
+        "circle_origin": { "$ref": "#/$defs/num_matrix" },
+        "circle_radius": { "$ref": "#/$defs/num_array" },
+        "cuboid_shape": { "$ref": "#/$defs/num_matrix" },
+        "sphere_origin": { "$ref": "#/$defs/num_matrix" },
+        "sphere_radius": { "$ref": "#/$defs/num_array" },
+        "cylinder_origin": { "$ref": "#/$defs/num_matrix" },
+        "cylinder_radius": { "$ref": "#/$defs/num_array" },
+        "cylinder_height": { "$ref": "#/$defs/num_array" },
+        "disk_origin": { "$ref": "#/$defs/num_matrix" },
+        "disk_height": { "$ref": "#/$defs/num_array" },
+        "disk_radius": { "$ref": "#/$defs/num_array" },
+        "disk_inner_radius": { "$ref": "#/$defs/num_array" },
+        "npc": { "$ref": "#/$defs/int" },
+        "npcg": { "$ref": "#/$defs/int" },
+        "pcgs": { "$ref": "#/$defs/int_array" },
+        "ccgs": { "$ref": "#/$defs/int_array" },
+        "mtd_vchg": { "$ref": "#/$defs/int_array" },
+        "modeww": { "$ref": "#/$defs/int" },
+        "conductivity": { "$ref": "#/$defs/num_array" },
+        "boundary_conductor_id": { "$ref": "#/$defs/int_array" },
+        "max_bounce_count": { "$ref": "#/$defs/int_array" },
+        "enable_secondary_electron_emission": { "$ref": "#/$defs/bool_array" },
+        "boundary_se_model_type": { "$ref": "#/$defs/int_array" },
+        "boundary_se_const_yield": { "$ref": "#/$defs/num_array" },
+        "boundary_se_yield_max": { "$ref": "#/$defs/num_array" },
+        "boundary_se_energy_max": { "$ref": "#/$defs/num_array" },
+        "boundary_se_species_id": { "$ref": "#/$defs/int_array" }
+      }
+    },
+    "wave_group": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "scrnt_group": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "jsrc_group": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "testch_group": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "dipole_group": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "emissn_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "decrease_current_according_to_incident_angle": { "$ref": "#/$defs/bool" },
+        "nflag_emit": { "$ref": "#/$defs/int_array" },
+        "nepl": { "$ref": "#/$defs/int_array" },
+        "flpf": { "$ref": "#/$defs/int_array" },
+        "flpb": { "$ref": "#/$defs/int_array" },
+        "curf": { "$ref": "#/$defs/num_array" },
+        "curb": { "$ref": "#/$defs/num_array" },
+        "qp": { "$ref": "#/$defs/num_array" },
+        "qpr": { "$ref": "#/$defs/num_array" },
+        "abvdem": { "$ref": "#/$defs/num_array" },
+        "dnsf": { "$ref": "#/$defs/int_array" },
+        "dnsb": { "$ref": "#/$defs/int_array" },
+        "imarea": { "$ref": "#/$defs/num_array" },
+        "ipcpl": { "$ref": "#/$defs/int_array" },
+        "nemd": { "$ref": "#/$defs/int_array" },
+        "omniemit": { "$ref": "#/$defs/int" },
+        "remf": { "$ref": "#/$defs/num_array" },
+        "remb": { "$ref": "#/$defs/num_array" },
+        "xmaxe": { "$ref": "#/$defs/num_array" },
+        "xmine": { "$ref": "#/$defs/num_array" },
+        "ymaxe": { "$ref": "#/$defs/num_array" },
+        "ymine": { "$ref": "#/$defs/num_array" },
+        "zmaxe": { "$ref": "#/$defs/num_array" },
+        "zmine": { "$ref": "#/$defs/num_array" },
+        "peject": { "$ref": "#/$defs/num" },
+        "thetaz": { "$ref": "#/$defs/num" },
+        "thetaxy": { "$ref": "#/$defs/num" },
+        "plreloc": { "$ref": "#/$defs/num" },
+        "mainprop": { "$ref": "#/$defs/num" },
+        "pe_ray_cast": { "$ref": "#/$defs/bool" },
+        "ray_zenith_angle_deg": { "$ref": "#/$defs/num" },
+        "ray_azimuth_angle_deg": { "$ref": "#/$defs/num" },
+        "periodic_raycast": { "$ref": "#/$defs/bool" },
+        "max_periodic_shift": { "$ref": "#/$defs/int" },
+        "max_boundary_height": { "$ref": "#/$defs/num" },
+        "emission_time_mode": { "$ref": "#/$defs/int" },
+        "emission_start_step": { "$ref": "#/$defs/int" },
+        "emission_end_step": { "$ref": "#/$defs/int" },
+        "emission_time_sigma": { "$ref": "#/$defs/num" },
+        "emission_leave_anti_particle": { "$ref": "#/$defs/bool" }
+      }
+    },
+    "mpi_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "nodes": { "$ref": "#/$defs/int_array" }
+      }
+    },
+    "verbose_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "EMSES_verbose": { "$ref": "#/$defs/int" },
+        "OHHELP_verbose": { "$ref": "#/$defs/int" },
+        "OHHELP_stats": { "$ref": "#/$defs/int" },
+        "OHHELP_repiter": { "$ref": "#/$defs/int" }
+      }
+    },
+    "gradema_group": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "coef_start": { "$ref": "#/$defs/num_value" },
+        "smooth_coef": { "$ref": "#/$defs/num_value" },
+        "grad_coef": { "$ref": "#/$defs/num_value" },
+        "grad_coef2": { "$ref": "#/$defs/num_value" },
+        "grad_type": { "$ref": "#/$defs/str" },
+        "control_grad_coef": { "$ref": "#/$defs/num_matrix" }
+      }
+    }
+  }
+}

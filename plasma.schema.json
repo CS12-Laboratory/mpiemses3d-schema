@@ -1938,7 +1938,7 @@
       },
       "allOf": [
         {
-          "description": "When nflag_emit > 0 (internal/PE emission), curf should be specified.",
+          "description": "Per-species parameters (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
           "if": {
             "properties": {
               "nflag_emit": {
@@ -2199,7 +2199,8 @@
             "required": [
               "rectangle_shape"
             ]
-          }
+          },
+          "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
         },
         {
           "if": {
@@ -2349,7 +2350,12 @@
           "type": "number",
           "description": "Fixed potential value [simulation units]. Only used when mtd_vchg = -1."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Conductor group. Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating (self-consistent charge accumulation),... |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when mtd_vchg = -1. |"
+        }
+      ]
     },
     "object_entry": {
       "type": "object",
@@ -2495,7 +2501,8 @@
               "zlpc",
               "zupc"
             ]
-          }
+          },
+          "description": "Conductor object. Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x,y,z] or cylinder cross-section center [c1,c2]. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: ... |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptco... |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with... |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=... |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell bounda... |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thi... |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |"
         },
         {
           "if": {
@@ -2609,7 +2616,12 @@
           "type": "number",
           "description": "Backward emission region extent for this plane."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Emission plane. Each `[[emissn.planes]]` entry defines one emission surface.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curbs` | number | Backward emission current density for this plane [simulation units]. |\n| `curfs` | number | Forward emission current density for this plane [simulation units]. |\n| `dnsbs` | number | Backward macro-particle division count for this plane. |\n| `dnsfs` | number | Forward macro-particle division count for this plane. |\n| `flpbs` | number | Backward particle flux for this emission plane. |\n| `flpfs` | number | Forward particle flux for this emission plane. |\n| `ipcpl` | integer | Conductor ID coupled to this emission plane for charge conservation. |\n| `nemd` | integer | Emission normal direction. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward). |\n| `remb` | number | Backward emission region extent for this plane. |\n| `remf` | number | Forward emission region extent for this plane. |\n| `xmaxe` | number | Emission plane x-upper bound [grid units]. |\n| `xmine` | number | Emission plane x-lower bound [grid units]. |\n| `ymaxe` | number | Emission plane y-upper bound [grid units]. |\n| `ymine` | number | Emission plane y-lower bound [grid units]. |\n| `zmaxe` | number | Emission plane z-upper bound [grid units]. |\n| `zmine` | number | Emission plane z-lower bound [grid units]. |"
+        }
+      ]
     },
     "dipole_source_entry": {
       "type": "object",
@@ -2645,7 +2657,12 @@
           ],
           "description": "Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Magnetic dipole. Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |"
+        }
+      ]
     },
     "testch_charge_entry": {
       "type": "object",
@@ -2677,7 +2694,12 @@
           "type": "number",
           "description": "Cutoff radius for the test charge potential [grid units]. Default: machine epsilon."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Test charge. Each `[[testch.charges]]` entry defines one charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine ep... |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |"
+        }
+      ]
     },
     "jsrc_source_entry": {
       "type": "object",
@@ -2710,7 +2732,12 @@
           "type": "number",
           "description": "Current source initial phase [rad]."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Current source. Each `[[jsrc.sources]]` entry defines one source.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `ajs` | array | Current source amplitude [Jx, Jy, Jz] in simulation units. |\n| `rjs` | array | Current source position [x, y, z] in grid units. |\n| `th0js` | number | Current source initial phase [rad]. |\n| `wjs` | number | Current source oscillation frequency [simulation units]. |"
+        }
+      ]
     }
   }
 }

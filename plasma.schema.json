@@ -2015,6 +2015,69 @@
             "type": "number"
           },
           "description": "Energy at max SEE yield per species [EMSES eV]."
+        },
+        "boundary_mirror_reflection_rate": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Specular reflection probability per species (0-1)."
+        },
+        "boundary_reversal_reflection_rate": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Reversal (backscatter) reflection probability per species (0-1)."
+        },
+        "boundary_mirror_reflect_alpha": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Beckmann roughness parameter for specular reflection per species."
+        },
+        "boundary_reversal_reflect_alpha": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Beckmann roughness parameter for reversal reflection per species."
+        },
+        "boundary_mirror_reflect_energy_loss_frac": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Kinetic energy loss fraction on specular reflection per species."
+        },
+        "boundary_reversal_reflect_energy_loss_frac": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Kinetic energy loss fraction on reversal reflection per species."
+        },
+        "boundary_se_model_type": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "SEE yield model type per species. 0=Whipple (1981)."
+        },
+        "boundary_se_const_yield": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Constant SEE yield per species (for const-yield model)."
+        },
+        "boundary_se_species_id": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Species ID for emitted secondary electrons per species (default: 1)."
         }
       },
       "allOf": [

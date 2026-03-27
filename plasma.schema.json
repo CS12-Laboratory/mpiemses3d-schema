@@ -99,7 +99,7 @@
     },
     "species": {
       "type": "array",
-      "description": "Per-species parameter definitions. Each entry sets parameters for species i across plasma, intp, inp, emissn, digcon, and system groups.",
+      "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
       "items": {
         "$ref": "#/$defs/species_entry"
       }
@@ -262,27 +262,27 @@
       "properties": {
         "deltax": {
           "type": "number",
-          "description": "Grid spacing [m]."
+          "description": "Grid spacing [m] for unit conversion by the preprocessor."
         },
         "deltat": {
           "type": "number",
-          "description": "Time step [s]."
+          "description": "Time step [s] for unit conversion by the preprocessor."
         },
         "massratio": {
           "type": "number",
-          "description": "Ion-to-electron mass ratio."
+          "description": "Ion-to-electron mass ratio (e.g., 1836 for hydrogen)."
         },
         "density": {
           "type": "number",
-          "description": "Plasma number density [m^-3]."
+          "description": "Reference plasma number density [m^-3] for normalization."
         },
         "etemp": {
           "type": "number",
-          "description": "Electron temperature [eV]."
+          "description": "Electron temperature [eV] for thermal velocity calculation."
         },
         "itemp": {
           "type": "number",
-          "description": "Ion temperature [eV]."
+          "description": "Ion temperature [eV] for thermal velocity calculation."
         },
         "phtemp": {
           "type": "number",
@@ -341,7 +341,11 @@
         },
         "nflag_testp": {
           "type": "integer",
-          "description": "Test particle flag."
+          "description": "Test particle flag. 0=normal simulation, 1=test particle mode.",
+          "enum": [
+            0,
+            1
+          ]
         }
       }
     },
@@ -355,23 +359,23 @@
           "items": {
             "type": "integer"
           },
-          "description": "[restart_flag, snapshot_flag]. restart_flag: 0=new, 1=restart from SNAPSHOT0. snapshot_flag: 0=no output, 1=save to SNAPSHOT1."
+          "description": "Job control flags [restart_mode, snapshot_mode]. restart_mode: 0=new run, >0=continue from SNAPSHOT0."
         },
         "nstep": {
           "type": "integer",
-          "description": "Total number of time steps."
+          "description": "Total number of time steps to simulate."
         },
         "lstep": {
           "type": "integer",
-          "description": "Last step (alternative to nstep)."
+          "description": "Last completed step (used internally for restart; overrides nstep if >0)."
         },
         "maxt": {
           "type": "integer",
-          "description": "Maximum wall-clock time [s]."
+          "description": "Maximum wall-clock time [min]."
         },
         "random_seed": {
           "type": "integer",
-          "description": "Random number generator seed."
+          "description": "Random number generator seed. 0=use default, >0=deterministic seed for reproducibility."
         }
       }
     },
@@ -382,119 +386,119 @@
       "properties": {
         "i1hdf": {
           "type": "integer",
-          "description": "HDF5 output flag (axis 1)."
+          "description": "HDF5 output spatial stride in axis 1. -1=no output, 1=every cell."
         },
         "i2hdf": {
           "type": "integer",
-          "description": "HDF5 output flag (axis 2)."
+          "description": "HDF5 output spatial stride in axis 2. -1=no output, 1=every cell."
         },
         "i3hdf": {
           "type": "integer",
-          "description": "HDF5 output flag (axis 3)."
+          "description": "HDF5 output spatial stride in axis 3. -1=no output, 1=every cell."
         },
         "hdfdigstart": {
           "type": "integer",
-          "description": "Start time step for HDF5 diagnostic output."
+          "description": "Time step to start HDF5 diagnostic output. 0=from beginning."
         },
         "hdfdigend": {
           "type": "integer",
-          "description": "End time step for HDF5 diagnostic output."
+          "description": "Time step to stop HDF5 diagnostic output. -2=until end."
         },
         "ifdiag": {
           "type": "integer",
-          "description": "Field diagnostic output interval [steps]."
+          "description": "Field diagnostic output interval. 0=no output."
         },
         "ijdiag": {
           "type": "integer",
-          "description": "Current diagnostic output interval [steps]."
+          "description": "Current diagnostic output interval. 0=no output."
         },
         "iediag": {
           "type": "integer",
-          "description": "Energy diagnostic interval [steps]. Negative excludes damping region."
+          "description": "Energy diagnostic output interval. 0=no output."
         },
         "iddiag": {
           "type": "integer",
-          "description": "Particle distribution diagnostic interval [steps]."
+          "description": "Density diagnostic output interval. 0=no output."
         },
         "isdiag": {
           "type": "integer",
-          "description": "Sub-diagnostic interval [steps]. Negative disables output."
+          "description": "Snapshot output interval. 0=no output."
         },
         "iadiag": {
           "type": "integer",
-          "description": "Additional diagnostic interval [steps]."
+          "description": "Absorption diagnostic output interval. 0=no output."
         },
         "intfoc": {
           "type": "integer",
-          "description": "Main loop diagnostic interval (should be a multiple of mltstp). Default: 128."
+          "description": "Number of main loop repetitions between diagnostic outputs. Should be an integer multiple of mltstp."
         },
         "itchck": {
           "type": "integer",
-          "description": "Checkpoint interval [steps]."
+          "description": "Number of main loop repetitions between CPU time checks (see maxt)."
         },
         "daverg": {
           "type": "integer",
-          "description": "Time-averaging window for diagnostics."
+          "description": "Time-averaging factor for field diagnostics. 0=instantaneous, >0=averaged over daverg steps."
         },
         "ipahdf": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Per-species field data skip factor for HDF5 output."
+          "description": "HDF5 particle data skip factor per species. 0=no output."
         },
         "ipadig": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Per-species particle data skip factor."
+          "description": "Particle diagnostic output interval per species. 0=no output."
         },
         "ipaxyz": {
           "$ref": "#/$defs/int_value",
-          "description": "Particle data storage options: [x, y, z, vx, vy, vz, id] per species. 1=store, 0=skip."
+          "description": "Particle data storage flags (7-element array per species). Elements: [x, y, z, vx, vy, vz, trace_id]."
         },
         "ifxyz": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field data storage options: [ex, ey, ez, bx, by, bz, rho]. 1=store, 0=skip."
+          "description": "Field output flags (7-element array). [Ex, Ey, Ez, Bx, By, Bz, phi]. 1=output, 0=skip."
         },
         "ijxyz": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Current data storage: [ajx, ajy, ajz, phi]. 1=store, 0=skip."
+          "description": "Current output flags (4-element array). [Jx, Jy, Jz, rho]. 1=output, 0=skip."
         },
         "nvx": {
           "type": "integer",
-          "description": "Velocity-space bins (x)."
+          "description": "Number of velocity-space bins in x for distribution function diagnostics."
         },
         "nvy": {
           "type": "integer",
-          "description": "Velocity-space bins (y)."
+          "description": "Number of velocity-space bins in y for distribution function diagnostics."
         },
         "nvz": {
           "type": "integer",
-          "description": "Velocity-space bins (z)."
+          "description": "Number of velocity-space bins in z for distribution function diagnostics."
         },
         "ikxmax": {
           "type": "integer",
-          "description": "Maximum k-space index (x) for spectral diagnostics."
+          "description": "Maximum wave number in x for k-spectrum analysis."
         },
         "ikymax": {
           "type": "integer",
-          "description": "Maximum k-space index (y) for spectral diagnostics."
+          "description": "Maximum wave number in y for k-spectrum analysis."
         },
         "ikzmax": {
           "type": "integer",
-          "description": "Maximum k-space index (z) for spectral diagnostics."
+          "description": "Maximum wave number in z for k-spectrum analysis."
         },
         "emarlxt": {
           "type": "integer",
-          "description": "EMA relaxation time for diagnostics."
+          "description": "External margin step count for energy analysis timing."
         }
       }
     },
@@ -516,7 +520,7 @@
         },
         "cv": {
           "type": "number",
-          "description": "Normalized speed of light."
+          "description": "Normalized speed of light c/v_ref. Controls CFL condition and numerical dispersion."
         },
         "gfactor": {
           "type": "number",
@@ -588,15 +592,15 @@
         },
         "nx": {
           "type": "integer",
-          "description": "Number of grid cells in x."
+          "description": "Number of grid cells in x-direction."
         },
         "ny": {
           "type": "integer",
-          "description": "Number of grid cells in y."
+          "description": "Number of grid cells in y-direction."
         },
         "nz": {
           "type": "integer",
-          "description": "Number of grid cells in z."
+          "description": "Number of grid cells in z-direction."
         }
       }
     },
@@ -607,60 +611,60 @@
       "properties": {
         "nspec": {
           "type": "integer",
-          "description": "Number of particle species (e.g. 1=electron, 2=ion, 3=photoelectron)."
+          "description": "Number of particle species."
         },
         "mltstp": {
           "type": "integer",
-          "description": "Number of field update loops per particle push (multiple time step). Default: 1."
+          "description": "Multiple time step ratio: number of field update sub-steps per particle push step (default: 1)."
         },
         "mltstpf": {
           "type": "integer",
-          "description": "Complementary field update multiplier (default: 1)."
+          "description": "Field sub-step factor for the implicit solver (default: 1). Used with mltstp for EM mode."
         },
         "juncan": {
           "type": "integer",
-          "description": "Current cancellation option. 0=none, 1=subtract uniform current, 2=no ES + subtract, -2=no ES only, >=1000=test particle mode."
+          "description": "Uniform current cancellation. 0=off, 1=subtract uniform current, 2=also skip ES component, -2=skip ES only. >=1000 = test particle mode (wave field given externally)."
         },
         "ionchg": {
           "type": "integer",
-          "description": "Ion charging flag."
+          "description": "Background ion charge option. 0=uniform neutralization across system, 1=local neutralization at each grid point."
         },
         "nfbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free, 2=damping."
+          "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free (absorbing), 2=damping (wave-absorbing layer)."
         },
         "npbnd": {
           "$ref": "#/$defs/int_value",
-          "description": "Particle boundary condition per axis and species. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd."
+          "description": "Particle boundary condition per axis per species (3 x nspec). 0=periodic, 1=reflective, 2=free (escape/inject), -1=follow nfbnd."
         },
         "mtd_vbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Potential boundary condition per axis [x,y,z]. 0=periodic, 1=Dirichlet, 2=Neumann, 3=open/free-space (doubles FFT grid in that dimension)."
+          "description": "Potential boundary method per axis [x,y,z]. 0=periodic, 1=Dirichlet (fixed), 2=Neumann (zero gradient), 3=open/free-space (doubles FFT grid)."
         },
         "boundary_conditions": {
           "$ref": "#/$defs/num_value",
-          "description": "Boundary condition values."
+          "description": "Boundary condition values as [lower, upper] per axis (2x3 array). Interpretation depends on nfbnd/mtd_vbnd settings."
         },
         "iphiref": {
           "$ref": "#/$defs/int_value",
-          "description": "Potential reference point indices."
+          "description": "Reference point indices for potential solver (2x3 array: [lower,upper] per axis)."
         },
         "imask": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field component masking flags [B, E_trans, E_long, J, rho, …]. 1=enabled, 0=masked."
+          "description": "Field component mask (7-element array). Selects which components to zero: [B-field, E-trans, E-long, current, charge, unused, unused]. 0=keep, 1=mask."
         },
         "separate_accumulated_and_space_charge": {
           "type": "boolean",
-          "description": "If true, compute surface (accumulated) and space charge contributions separately (default: true)."
+          "description": "Separate accumulated surface charge from space charge in the Poisson solver (default: false)."
         }
       }
     },
@@ -833,7 +837,7 @@
         "dnsf": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "number"
           },
           "description": "Particle density scaling factor. Sets how many physical particles are grouped into one macro-particle. Mutually exclusive with npin."
         }
@@ -846,11 +850,11 @@
       "properties": {
         "tcs": {
           "type": "number",
-          "description": "Time constant parameter."
+          "description": "Temperature ratio parameter for sound speed calculation (Te/Ti)."
         },
         "cs": {
           "type": "number",
-          "description": "Sound speed parameter."
+          "description": "Ion acoustic speed (sound speed) in simulation units."
         }
       }
     },
@@ -896,7 +900,7 @@
       "properties": {
         "boundary_type": {
           "type": "string",
-          "description": "Single-object inner boundary type. Use 'complex' with boundary_types for multiple sub-boundaries.",
+          "description": "Overall boundary surface type. Selects the boundary geometry model applied to the simulation domain.",
           "enum": [
             "none",
             "flat-surface",
@@ -910,7 +914,7 @@
         },
         "boundary_types": {
           "type": "array",
-          "description": "Sub-boundary type list for complex mode.",
+          "description": "Sub-boundary type list for complex mode. Each element defines the shape of one sub-boundary element.",
           "items": {
             "type": "string",
             "enum": [
@@ -931,7 +935,14 @@
               "diskz",
               "plane-with-circlex",
               "plane-with-circley",
-              "plane-with-circlez"
+              "plane-with-circlez",
+              "flat-surface",
+              "rectangle-hole",
+              "dent-rectangle-hole",
+              "cylinder-hole",
+              "hyperboloid-hole",
+              "ellipsoid-hole",
+              "plane-with-circle-hole"
             ]
           }
         },
@@ -1100,32 +1111,32 @@
         },
         "npc": {
           "type": "integer",
-          "description": "Number of solid objects."
+          "description": "Number of solid conductor objects defined in the simulation."
         },
         "npcg": {
           "type": "integer",
-          "description": "Number of conductor groups."
+          "description": "Number of conductor groups. Objects in the same group share electrical properties."
         },
         "pcgs": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Conductor group assignment per object."
+          "description": "Conductor group assignment per object (1-based index into group list)."
         },
         "ccgs": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Conductor coupling index per object."
+          "description": "Conductor coupling group index per object (must equal pcgs in current implementation)."
         },
         "mtd_vchg": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Potential treatment per object. 0=floating (self-consistent), -1=fixed (held at pfixed)."
+          "description": "Potential treatment method per conductor group. 0=floating, -1=fixed potential."
         },
         "modeww": {
           "type": "integer",
@@ -1196,21 +1207,21 @@
         },
         "boundaries": {
           "type": "array",
-          "description": "Array-of-tables for per-boundary definition. Each entry specifies one boundary with its type and shape parameters. Implies boundary_type = 'complex'.",
+          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
           "items": {
             "$ref": "#/$defs/boundary_entry"
           }
         },
         "conductor_groups": {
           "type": "object",
-          "description": "Named conductor groups. Each key is a group name, value defines electrical properties (mtd_vchg, pfixed).",
+          "description": "Conductor groups (format_version = 2). Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating (self-consistent charge accumulation),... |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when mtd_vchg = -1. |",
           "additionalProperties": {
             "$ref": "#/$defs/conductor_group_entry"
           }
         },
         "objects": {
           "type": "array",
-          "description": "Array of solid/conductor objects. Each entry defines geometry and conductor group membership. npc/npcg/pcgs/ccgs are auto-computed.",
+          "description": "Conductor objects (format_version = 2). Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x,y,z] or cylinder cross-section center [c1,c2]. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: ... |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptco... |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with... |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=... |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell bounda... |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thi... |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |",
           "items": {
             "$ref": "#/$defs/object_entry"
           }
@@ -1327,7 +1338,7 @@
       "properties": {
         "sources": {
           "type": "array",
-          "description": "Array-of-tables for per-source definition. Auto-sets njs from count.",
+          "description": "Current sources (format_version = 2). Each `[[jsrc.sources]]` entry defines one current source.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `ajs` | array | Current source amplitude [Jx, Jy, Jz] in simulation units. |\n| `rjs` | array | Current source position [x, y, z] in grid units. |\n| `th0js` | number | Current source initial phase [rad]. |\n| `wjs` | number | Current source oscillation frequency [simulation units]. |",
           "items": {
             "$ref": "#/$defs/jsrc_source_entry"
           }
@@ -1341,7 +1352,7 @@
       "properties": {
         "charges": {
           "type": "array",
-          "description": "Array-of-tables for per-charge definition. Auto-sets ntch from count.",
+          "description": "Test charges (format_version = 2). Each `[[testch.charges]]` entry defines one test charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine ep... |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
           "items": {
             "$ref": "#/$defs/testch_charge_entry"
           }
@@ -1355,7 +1366,7 @@
       "properties": {
         "sources": {
           "type": "array",
-          "description": "Array-of-tables for per-dipole definition. Auto-sets nmd from count.",
+          "description": "Magnetic dipole sources (format_version = 2). Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |",
           "items": {
             "$ref": "#/$defs/dipole_source_entry"
           }
@@ -1369,7 +1380,7 @@
       "properties": {
         "decrease_current_according_to_incident_angle": {
           "type": "boolean",
-          "description": "If true, reduce emission current by cos(incidence angle)."
+          "description": "Scale emission current by cos(incident angle) for non-normal solar illumination (default: true)."
         },
         "nflag_emit": {
           "type": "array",
@@ -1382,229 +1393,288 @@
               3
             ]
           },
-          "description": "Emission type per species. 0=external (domain boundary), 1=internal (inner surface), 2=photoelectron (ray-casting), 3=secondary electron emission."
+          "description": "Emission type per species. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited emission, 3=secondary electron emission (SEE)."
         },
         "nepl": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Number of emission planes per species."
+          "description": "Number of explicit emission planes per species."
         },
         "flpf": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "number"
           },
-          "description": "Forward emission plane flag."
+          "description": "Forward particle flux at the emission surface per species. Computed from curf: flpf = curf / |q|."
         },
         "flpb": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "number"
           },
-          "description": "Backward emission plane flag."
+          "description": "Backward particle flux at the emission surface per species."
         },
         "curf": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Base emission current density per species [A/m^2 in EMSES units]."
+          "description": "Forward emission current density per species [simulation units]."
         },
         "curb": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Backward emission current density per species."
+          "description": "Backward emission current density per species [simulation units]."
         },
         "qp": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Emission charge parameter per species."
+          "description": "Macro-particle charge for forward emission per species."
         },
         "qpr": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Reverse emission charge parameter per species."
+          "description": "Macro-particle charge for backward emission per species."
         },
         "abvdem": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Above-surface emission distance parameter."
+          "description": "Above-damage emission parameter per species. Threshold energy for emission activation."
         },
         "dnsf": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "number"
           },
-          "description": "Macro-particle division count for emitted particles."
+          "description": "Forward macro-particle division count per species for emission. Higher values = more particles with smaller weight."
         },
         "dnsb": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "number"
           },
-          "description": "Backward macro-particle division count."
+          "description": "Backward macro-particle division count per species for emission."
         },
         "imarea": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Emission area parameter."
+          "description": "Emission area mask per conductor. Associates emission with a specific conductor for charge conservation."
         },
         "ipcpl": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Conductor ID coupled to each emission plane for charge conservation."
+          "description": "Conductor ID coupled to emission plane for charge conservation."
         },
         "nemd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Emission direction per plane: ±1=x, ±2=y, ±3=z normal. Sign sets positive/negative direction."
+          "description": "Emission normal direction per emission plane. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward)."
         },
         "omniemit": {
-          "type": "integer",
-          "description": "Omni-directional emission flag."
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Omni-directional emission flag per emission plane. 0=directional, 1=omni-directional (half-Maxwellian)."
         },
         "remf": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Forward emission rate modifier."
+          "description": "Forward emission region extent per species."
         },
         "remb": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Backward emission rate modifier."
+          "description": "Backward emission region extent per species."
         },
         "xmaxe": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Upper x-boundary of emission plane [grid units]."
+          "description": "Emission region x-upper bound per emission plane [grid units]."
         },
         "xmine": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Lower x-boundary of emission plane [grid units]."
+          "description": "Emission region x-lower bound per emission plane [grid units]."
         },
         "ymaxe": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Upper y-boundary of emission plane [grid units]."
+          "description": "Emission region y-upper bound per emission plane [grid units]."
         },
         "ymine": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Lower y-boundary of emission plane [grid units]."
+          "description": "Emission region y-lower bound per emission plane [grid units]."
         },
         "zmaxe": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Upper z-boundary of emission plane [grid units]."
+          "description": "Emission region z-upper bound per emission plane [grid units]."
         },
         "zmine": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Lower z-boundary of emission plane [grid units]."
-        },
-        "peject": {
-          "type": "number",
-          "description": "Ejection energy parameter."
+          "description": "Emission region z-lower bound per emission plane [grid units]."
         },
         "thetaz": {
           "type": "number",
-          "description": "Emission zenith angle [deg]."
+          "description": "Emission elevation angle [deg] from the surface normal. Used with thetaxy for directed emission."
         },
         "thetaxy": {
           "type": "number",
-          "description": "Emission azimuthal angle [deg]."
+          "description": "Emission azimuthal angle [deg] in the x-y plane. Used with thetaz for directed emission."
         },
         "plreloc": {
           "type": "number",
-          "description": "Particle relocation distance after emission."
+          "description": "Plasma relocation parameter for emission near conductors (default: 0.0)."
         },
         "mainprop": {
           "type": "number",
-          "description": "Main propagation parameter."
+          "description": "Main propagation cosine factor for emission direction (default: 1.0 = normal to surface)."
         },
         "pe_ray_cast": {
           "type": "boolean",
-          "description": "Enable ray-casting based photoemission. Surface exposure to illumination determines emission area."
+          "description": "Enable photoelectron ray-casting to determine shadowed regions on the emission surface (default: false)."
         },
         "ray_zenith_angle_deg": {
-          "type": "number",
-          "description": "Solar zenith angle [deg] for ray-casting."
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Solar zenith angle [deg] per species for photoelectron ray-casting emission direction."
         },
         "ray_azimuth_angle_deg": {
-          "type": "number",
-          "description": "Solar azimuth angle [deg] for ray-casting."
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Solar azimuth angle [deg] per species for photoelectron ray-casting emission direction."
         },
         "periodic_raycast": {
           "type": "boolean",
-          "description": "Enable periodic ray-casting (replicate objects in xy-plane for periodic shadows)."
+          "description": "Enable periodic boundary-aware ray-casting for photoelectron emission (default: false)."
         },
         "max_periodic_shift": {
           "type": "integer",
-          "description": "Maximum horizontal shift for periodic ray-casting replication."
+          "description": "Maximum periodic image shift count for periodic ray-casting (default: 10)."
         },
         "max_boundary_height": {
           "type": "number",
-          "description": "Maximum vertical height for estimating periodic ray-casting replication count."
+          "description": "Maximum boundary height [grid units] considered in ray-casting (default: 30)."
         },
         "emission_time_mode": {
-          "type": "integer",
-          "description": "Emission time variation mode. 0=constant, 1=Gaussian."
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Emission time variation mode per species. 0=constant, 1=Gaussian temporal profile."
         },
         "emission_start_step": {
-          "type": "integer",
-          "description": "Time step to start particle emission."
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Time step to begin particle emission per species. 0=from start."
         },
         "emission_end_step": {
-          "type": "integer",
-          "description": "Time step to stop particle emission."
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Time step to stop particle emission per species. -1=no stop (continue until nstep)."
         },
         "emission_time_sigma": {
-          "type": "number",
-          "description": "Standard deviation for Gaussian emission time variation."
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Standard deviation [steps] for Gaussian emission time variation per species."
         },
         "emission_leave_anti_particle": {
-          "type": "boolean",
-          "description": "If true, leave an anti-particle at the emission site to maintain charge neutrality (default: true)."
+          "$ref": "#/$defs/bool_value",
+          "description": "Leave an anti-particle at the emission site per species to maintain local charge neutrality (default: true)."
         },
         "planes": {
           "type": "array",
-          "description": "Array-of-tables for per-plane emission definition. Auto-sets nepl from count.",
+          "description": "Explicit emission planes (format_version = 2). Each `[[emissn.planes]]` entry defines one emission plane.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curbs` | number | Backward emission current density for this plane [simulation units]. |\n| `curfs` | number | Forward emission current density for this plane [simulation units]. |\n| `dnsbs` | number | Backward macro-particle division count for this plane. |\n| `dnsfs` | number | Forward macro-particle division count for this plane. |\n| `flpbs` | number | Backward particle flux for this emission plane. |\n| `flpfs` | number | Forward particle flux for this emission plane. |\n| `ipcpl` | integer | Conductor ID coupled to this emission plane for charge conservation. |\n| `nemd` | integer | Emission normal direction. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward). |\n| `remb` | number | Backward emission region extent for this plane. |\n| `remf` | number | Forward emission region extent for this plane. |\n| `xmaxe` | number | Emission plane x-upper bound [grid units]. |\n| `xmine` | number | Emission plane x-lower bound [grid units]. |\n| `ymaxe` | number | Emission plane y-upper bound [grid units]. |\n| `ymine` | number | Emission plane y-lower bound [grid units]. |\n| `zmaxe` | number | Emission plane z-upper bound [grid units]. |\n| `zmine` | number | Emission plane z-lower bound [grid units]. |",
           "items": {
             "$ref": "#/$defs/emission_plane_entry"
           }
+        },
+        "flpfs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Forward emission plane flag per emission plane."
+        },
+        "flpbs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Backward emission plane flag per emission plane."
+        },
+        "curfs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Forward current density per emission plane."
+        },
+        "curbs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Backward current density per emission plane."
+        },
+        "dnsfs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Forward macro-particle division count per emission plane."
+        },
+        "dnsbs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Backward macro-particle division count per emission plane."
         }
       },
       "allOf": [
@@ -1743,63 +1813,63 @@
       "properties": {
         "wp": {
           "type": "number",
-          "description": "Plasma frequency for this species."
+          "description": "Plasma frequency for this species [simulation units]."
         },
         "qm": {
           "type": "number",
-          "description": "Charge-to-mass ratio (electron = -1.0)."
+          "description": "Charge-to-mass ratio for this species (negative for electrons)."
         },
         "npin": {
           "type": "integer",
-          "description": "Initial macro-particle count."
+          "description": "Initial macro-particle count at t=0. Set <0 to start with zero particles (beam injection only)."
         },
         "np": {
           "type": "integer",
-          "description": "Particle buffer size."
+          "description": "Maximum particle buffer size. Must be >= npin (auto-expanded if injection is enabled)."
         },
         "path": {
           "type": "number",
-          "description": "Parallel thermal velocity."
+          "description": "Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2))."
         },
         "peth": {
           "type": "number",
-          "description": "Perpendicular thermal velocity."
+          "description": "Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth."
         },
         "vdri": {
           "type": "number",
-          "description": "Bulk drift velocity magnitude."
+          "description": "Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy."
         },
         "vdthz": {
           "type": "number",
-          "description": "Drift direction zenith angle [deg]."
+          "description": "Drift velocity polar angle [deg] from z-axis."
         },
         "vdthxy": {
           "type": "number",
-          "description": "Drift direction azimuthal angle [deg]."
+          "description": "Drift velocity azimuthal angle [deg] in the x-y plane."
         },
         "inpf": {
           "type": "integer",
-          "description": "Injection flag at lower x-boundary."
+          "description": "Injection flag at lower domain boundary. 0=no injection, 1=inject."
         },
         "inpb": {
           "type": "integer",
-          "description": "Injection flag at upper x-boundary."
+          "description": "Injection flag at upper domain boundary. 0=no injection, 1=inject."
         },
         "injct": {
           "type": "integer",
-          "description": "Injection interval [steps]."
+          "description": "Injection interval [steps]. 0=no periodic injection, >0=inject every injct steps."
         },
         "npr": {
           "type": "integer",
-          "description": "Injection sample count."
+          "description": "Number of standard-distribution samples for injection particle generation per species."
         },
         "curf": {
           "type": "number",
-          "description": "Emission current density [A/m^2]."
+          "description": "Forward emission current density [simulation units]."
         },
         "dnsf": {
           "type": "number",
-          "description": "Particle density scaling factor (real). Sets macro-particle grouping."
+          "description": "Density scaling factor (real). Higher values group more physical particles into one macro-particle. Mutually exclusive with npin."
         },
         "nflag_emit": {
           "type": "integer",
@@ -1809,31 +1879,31 @@
             2,
             3
           ],
-          "description": "Emission type. 0=external, 1=internal, 2=photoelectron (ray-casting), 3=secondary electron emission."
+          "description": "Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited, 3=secondary electron emission."
         },
         "ipaxyz": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Particle data storage [x,y,z,vx,vy,vz,id].",
+          "description": "Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id]. 1=store, 0=skip.",
           "minItems": 7,
           "maxItems": 7
         },
         "ipadig": {
           "type": "integer",
-          "description": "Particle data skip factor."
+          "description": "Particle diagnostic output interval. 0=no particle output for this species."
         },
         "ipahdf": {
           "type": "integer",
-          "description": "Field data skip factor."
+          "description": "HDF5 particle data skip factor. 0=no HDF5 output for this species."
         },
         "npbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Particle boundary conditions [x,y,z].",
+          "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd.",
           "minItems": 3,
           "maxItems": 3
         },
@@ -1893,7 +1963,7 @@
     },
     "boundary_entry": {
       "type": "object",
-      "description": "A single boundary element with its type and shape parameters.",
+      "description": "A single boundary element for complex mode.",
       "required": [
         "type"
       ],
@@ -1901,7 +1971,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "Boundary shape type.",
+          "description": "Boundary shape type (object or surface).",
           "enum": [
             "rectangle",
             "circlex",
@@ -1925,7 +1995,7 @@
         },
         "boundary_conductor_id": {
           "type": "integer",
-          "description": "Conductor ID for charge accounting."
+          "description": "Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group."
         },
         "rectangle_shape": {
           "type": "array",
@@ -1934,7 +2004,7 @@
           },
           "minItems": 6,
           "maxItems": 6,
-          "description": "[xmin, xmax, ymin, ymax, zmin, zmax]."
+          "description": "Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degenerate)."
         },
         "cuboid_shape": {
           "type": "array",
@@ -1943,7 +2013,7 @@
           },
           "minItems": 6,
           "maxItems": 6,
-          "description": "[xmin, xmax, ymin, ymax, zmin, zmax]."
+          "description": "Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units."
         },
         "sphere_origin": {
           "type": "array",
@@ -1952,11 +2022,11 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Center [x, y, z]."
+          "description": "Sphere center coordinates [x, y, z] in grid units."
         },
         "sphere_radius": {
           "type": "number",
-          "description": "Sphere radius."
+          "description": "Sphere radius in grid units."
         },
         "circle_origin": {
           "type": "array",
@@ -1965,11 +2035,11 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Center [x, y, z]."
+          "description": "Circle center coordinates [x, y, z] in grid units."
         },
         "circle_radius": {
           "type": "number",
-          "description": "Circle radius."
+          "description": "Circle radius in grid units."
         },
         "cylinder_origin": {
           "type": "array",
@@ -1978,15 +2048,15 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Bottom-center [x, y, z]."
+          "description": "Cylinder bottom-center coordinates [x, y, z] in grid units."
         },
         "cylinder_radius": {
           "type": "number",
-          "description": "Cylinder radius."
+          "description": "Cylinder radius in grid units."
         },
         "cylinder_height": {
           "type": "number",
-          "description": "Cylinder height."
+          "description": "Cylinder height in grid units along the alignment axis."
         },
         "disk_origin": {
           "type": "array",
@@ -1995,19 +2065,19 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Bottom-center [x, y, z]."
+          "description": "Disk bottom-center coordinates [x, y, z] in grid units."
         },
         "disk_radius": {
           "type": "number",
-          "description": "Outer radius."
+          "description": "Disk outer radius in grid units."
         },
         "disk_inner_radius": {
           "type": "number",
-          "description": "Inner radius."
+          "description": "Disk inner radius for annular disk in grid units (0 for solid disk)."
         },
         "disk_height": {
           "type": "number",
-          "description": "Thickness."
+          "description": "Disk thickness in grid units along the alignment axis."
         },
         "plane_with_circle_origin": {
           "type": "array",
@@ -2016,71 +2086,71 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Center of circular hole [x, y, z]."
+          "description": "Center coordinates [x, y, z] of circular hole in plane, in grid units."
         },
         "plane_with_circle_radius": {
           "type": "number",
-          "description": "Radius of circular hole."
+          "description": "Radius of the circular hole in the plane, in grid units."
         },
         "conductivity": {
           "type": "number",
-          "description": "Surface conductivity."
+          "description": "Surface conductivity of this boundary element."
         },
         "enable_secondary_electron_emission": {
           "type": "array",
           "items": {
             "type": "boolean"
           },
-          "description": "Enable SEE per species."
+          "description": "Enable secondary electron emission (SEE) for this boundary per species."
         },
         "boundary_se_yield_max": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Max SEE yield per species."
+          "description": "Maximum secondary electron emission (SEE) yield delta_max per species."
         },
         "boundary_se_energy_max": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Energy at max SEE yield per species [EMSES eV]."
+          "description": "Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species."
         },
         "boundary_mirror_reflection_rate": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Specular reflection probability per species (0-1)."
+          "description": "Specular (mirror) reflection probability per species (0.0–1.0)."
         },
         "boundary_reversal_reflection_rate": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Reversal (backscatter) reflection probability per species (0-1)."
+          "description": "Reversal (backscatter) reflection probability per species (0.0–1.0)."
         },
         "boundary_mirror_reflect_alpha": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Beckmann roughness parameter for specular reflection per species."
+          "description": "Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5)."
         },
         "boundary_reversal_reflect_alpha": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Beckmann roughness parameter for reversal reflection per species."
+          "description": "Beckmann roughness parameter alpha for reversal reflection per species."
         },
         "boundary_mirror_reflect_energy_loss_frac": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Kinetic energy loss fraction on specular reflection per species."
+          "description": "Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v)."
         },
         "boundary_reversal_reflect_energy_loss_frac": {
           "type": "array",
@@ -2094,21 +2164,21 @@
           "items": {
             "type": "integer"
           },
-          "description": "SEE yield model type per species. 0=Whipple (1981)."
+          "description": "SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield."
         },
         "boundary_se_const_yield": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Constant SEE yield per species (for const-yield model)."
+          "description": "Constant SEE yield value per species (used when model_type=1)."
         },
         "boundary_se_species_id": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Species ID for emitted secondary electrons per species (default: 1)."
+          "description": "Species ID of emitted secondary electrons per species (default: 1)."
         }
       },
       "allOf": [
@@ -2268,22 +2338,22 @@
     },
     "conductor_group_entry": {
       "type": "object",
-      "description": "Conductor group definition. Objects assigned to this group share the same electrical potential.",
+      "description": "A conductor group defining shared electrical properties.",
       "additionalProperties": true,
       "properties": {
         "mtd_vchg": {
           "type": "integer",
-          "description": "Potential treatment. 0=floating (self-consistent), -1=fixed (held at pfixed)."
+          "description": "Potential treatment method. 0=floating (self-consistent charge accumulation), -1=fixed potential (held at pfixed value)."
         },
         "pfixed": {
           "type": "number",
-          "description": "Fixed potential value (used when mtd_vchg=-1)."
+          "description": "Fixed potential value [simulation units]. Only used when mtd_vchg = -1."
         }
       }
     },
     "object_entry": {
       "type": "object",
-      "description": "A solid/conductor object with geometry and conductor group assignment.",
+      "description": "A solid conductor object with geometry and group assignment.",
       "required": [
         "conductor",
         "geotype"
@@ -2292,7 +2362,7 @@
       "properties": {
         "conductor": {
           "type": "string",
-          "description": "Name of the conductor group this object belongs to (must match a key in conductor_groups)."
+          "description": "Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups])."
         },
         "geotype": {
           "type": "integer",
@@ -2302,31 +2372,31 @@
             2,
             3
           ],
-          "description": "Shape type. 0 or 1=cuboid, 2=cylinder, 3=sphere."
+          "description": "Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere."
         },
         "xlpc": {
           "type": "number",
-          "description": "Cuboid x-lower bound."
+          "description": "Cuboid x-lower bound in grid units (geotype=0 or 1)."
         },
         "xupc": {
           "type": "number",
-          "description": "Cuboid x-upper bound."
+          "description": "Cuboid x-upper bound in grid units (geotype=0 or 1)."
         },
         "ylpc": {
           "type": "number",
-          "description": "Cuboid y-lower bound."
+          "description": "Cuboid y-lower bound in grid units (geotype=0 or 1)."
         },
         "yupc": {
           "type": "number",
-          "description": "Cuboid y-upper bound."
+          "description": "Cuboid y-upper bound in grid units (geotype=0 or 1)."
         },
         "zlpc": {
           "type": "number",
-          "description": "Cuboid z-lower bound."
+          "description": "Cuboid z-lower bound in grid units (geotype=0 or 1)."
         },
         "zupc": {
           "type": "number",
-          "description": "Cuboid z-upper bound."
+          "description": "Cuboid z-upper bound in grid units (geotype=0 or 1)."
         },
         "bdyalign": {
           "type": "integer",
@@ -2335,18 +2405,18 @@
             2,
             3
           ],
-          "description": "Cylinder axis direction. 1=x, 2=y, 3=z."
+          "description": "Cylinder axis alignment direction. 1=x, 2=y, 3=z."
         },
         "bdyradius": {
           "type": "number",
-          "description": "Cylinder or sphere radius."
+          "description": "Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units."
         },
         "bdycoord": {
           "type": "array",
           "items": {
             "type": "number"
           },
-          "description": "Center coordinates [x,y,z] for sphere, or [c1,c2] for cylinder cross-section."
+          "description": "Center coordinates for sphere [x,y,z] or cylinder cross-section center [c1,c2]."
         },
         "bdyedge": {
           "type": "array",
@@ -2355,19 +2425,19 @@
           },
           "minItems": 2,
           "maxItems": 2,
-          "description": "Cylinder axis endpoints [lower, upper]."
+          "description": "Cylinder axis endpoints [lower, upper] along the alignment axis."
         },
         "biasp": {
           "type": "number",
-          "description": "Bias potential offset."
+          "description": "Bias potential offset applied to this conductor [simulation units] (default: 0.0)."
         },
         "dscaled": {
           "type": "number",
-          "description": "Capacitance scaling factor (default: 1.0)."
+          "description": "Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations."
         },
         "nflag_subcell": {
           "type": "integer",
-          "description": "Sub-cell boundary flag."
+          "description": "Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation."
         },
         "wirealign": {
           "type": "integer",
@@ -2377,19 +2447,19 @@
             2,
             3
           ],
-          "description": "Wire/boom axis direction. 0=disabled, 1=x, 2=y, 3=z."
+          "description": "Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor."
         },
         "wirehlength": {
           "type": "number",
-          "description": "Wire half-length along axis."
+          "description": "Wire half-length along the alignment axis in grid units."
         },
         "wirerradius": {
           "type": "number",
-          "description": "Wire physical radius."
+          "description": "Wire physical radius for particle collision detection in grid units."
         },
         "wireeradius": {
           "type": "number",
-          "description": "Wire effective (electrical) radius."
+          "description": "Wire effective (electrical) radius for capacitance calculation."
         },
         "wireorigin": {
           "type": "array",
@@ -2398,7 +2468,7 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Wire origin [x, y, z]."
+          "description": "Wire origin coordinates [x, y, z] in grid units."
         }
       },
       "allOf": [
@@ -2469,7 +2539,7 @@
     },
     "emission_plane_entry": {
       "type": "object",
-      "description": "An emission plane with direction, spatial bounds, and current parameters.",
+      "description": "An explicit emission plane definition.",
       "required": [
         "nemd"
       ],
@@ -2477,67 +2547,67 @@
       "properties": {
         "nemd": {
           "type": "integer",
-          "description": "Emission normal direction: ±1=x, ±2=y, ±3=z. Sign sets positive/negative."
+          "description": "Emission normal direction. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward)."
         },
         "ipcpl": {
           "type": "integer",
-          "description": "Conductor ID coupled to this plane for charge conservation."
+          "description": "Conductor ID coupled to this emission plane for charge conservation."
         },
         "xmine": {
           "type": "number",
-          "description": "Lower x-boundary of emission plane [grid units]."
+          "description": "Emission plane x-lower bound [grid units]."
         },
         "xmaxe": {
           "type": "number",
-          "description": "Upper x-boundary of emission plane [grid units]."
+          "description": "Emission plane x-upper bound [grid units]."
         },
         "ymine": {
           "type": "number",
-          "description": "Lower y-boundary of emission plane [grid units]."
+          "description": "Emission plane y-lower bound [grid units]."
         },
         "ymaxe": {
           "type": "number",
-          "description": "Upper y-boundary of emission plane [grid units]."
+          "description": "Emission plane y-upper bound [grid units]."
         },
         "zmine": {
           "type": "number",
-          "description": "Lower z-boundary of emission plane [grid units]."
+          "description": "Emission plane z-lower bound [grid units]."
         },
         "zmaxe": {
           "type": "number",
-          "description": "Upper z-boundary of emission plane [grid units]."
+          "description": "Emission plane z-upper bound [grid units]."
         },
         "curfs": {
           "type": "number",
-          "description": "Forward emission current density for this plane."
+          "description": "Forward emission current density for this plane [simulation units]."
         },
         "curbs": {
           "type": "number",
-          "description": "Backward emission current density for this plane."
+          "description": "Backward emission current density for this plane [simulation units]."
         },
         "dnsfs": {
-          "type": "integer",
-          "description": "Forward macro-particle division for this plane."
+          "type": "number",
+          "description": "Forward macro-particle division count for this plane."
         },
         "dnsbs": {
-          "type": "integer",
-          "description": "Backward macro-particle division for this plane."
+          "type": "number",
+          "description": "Backward macro-particle division count for this plane."
         },
         "flpfs": {
           "type": "number",
-          "description": "Forward flux for this plane."
+          "description": "Forward particle flux for this emission plane."
         },
         "flpbs": {
           "type": "number",
-          "description": "Backward flux for this plane."
+          "description": "Backward particle flux for this emission plane."
         },
         "remf": {
           "type": "number",
-          "description": "Forward emission rate modifier."
+          "description": "Forward emission region extent for this plane."
         },
         "remb": {
           "type": "number",
-          "description": "Backward emission rate modifier."
+          "description": "Backward emission region extent for this plane."
         }
       }
     },
@@ -2556,15 +2626,15 @@
         },
         "mdx": {
           "type": "number",
-          "description": "Dipole x-position."
+          "description": "Dipole x-position in grid units."
         },
         "mdy": {
           "type": "number",
-          "description": "Dipole y-position."
+          "description": "Dipole y-position in grid units."
         },
         "mdz": {
           "type": "number",
-          "description": "Dipole z-position."
+          "description": "Dipole z-position in grid units."
         },
         "mddir": {
           "type": "integer",
@@ -2573,13 +2643,13 @@
             2,
             3
           ],
-          "description": "Dipole direction: 1=x, 2=y, 3=z."
+          "description": "Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis."
         }
       }
     },
     "testch_charge_entry": {
       "type": "object",
-      "description": "A static test charge.",
+      "description": "A test charge definition.",
       "additionalProperties": true,
       "properties": {
         "rtch": {
@@ -2589,29 +2659,29 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Position [x, y, z] in grid coordinates."
+          "description": "Test charge position [x, y, z] in grid units."
         },
         "qtch": {
           "type": "number",
-          "description": "Charge magnitude."
+          "description": "Test charge value [simulation charge units]."
         },
         "e1tch": {
           "type": "number",
-          "description": "Electric field amplitude parameter."
+          "description": "Electric field amplitude parameter for the test charge."
         },
         "p1tch": {
           "type": "number",
-          "description": "Potential parameter."
+          "description": "Potential amplitude parameter for the test charge."
         },
         "rcutoff": {
           "type": "number",
-          "description": "Cutoff radius to prevent singularity at charge center."
+          "description": "Cutoff radius for the test charge potential [grid units]. Default: machine epsilon."
         }
       }
     },
     "jsrc_source_entry": {
       "type": "object",
-      "description": "A local oscillating current source.",
+      "description": "A current source definition.",
       "additionalProperties": true,
       "properties": {
         "rjs": {
@@ -2621,7 +2691,7 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Grid position [x, y, z]."
+          "description": "Current source position [x, y, z] in grid units."
         },
         "ajs": {
           "type": "array",
@@ -2630,15 +2700,15 @@
           },
           "minItems": 3,
           "maxItems": 3,
-          "description": "Current density amplitude [Jx, Jy, Jz]."
+          "description": "Current source amplitude [Jx, Jy, Jz] in simulation units."
         },
         "wjs": {
           "type": "number",
-          "description": "Oscillation angular frequency."
+          "description": "Current source oscillation frequency [simulation units]."
         },
         "th0js": {
           "type": "number",
-          "description": "Initial phase [rad]."
+          "description": "Current source initial phase [rad]."
         }
       }
     }

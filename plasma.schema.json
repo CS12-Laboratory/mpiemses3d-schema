@@ -1223,7 +1223,10 @@
               "boundary_type": {
                 "const": "flat-surface"
               }
-            }
+            },
+            "required": [
+              "boundary_type"
+            ]
           },
           "then": {
             "required": [
@@ -1240,7 +1243,10 @@
                   "dent-rectangle-hole"
                 ]
               }
-            }
+            },
+            "required": [
+              "boundary_type"
+            ]
           },
           "then": {
             "required": [
@@ -1264,7 +1270,10 @@
                   "ellipsoid-hole"
                 ]
               }
-            }
+            },
+            "required": [
+              "boundary_type"
+            ]
           },
           "then": {
             "required": [
@@ -1279,7 +1288,10 @@
               "boundary_type": {
                 "const": "complex"
               }
-            }
+            },
+            "required": [
+              "boundary_type"
+            ]
           },
           "then": {
             "anyOf": [
@@ -1362,9 +1374,15 @@
         "nflag_emit": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
           },
-          "description": "Emission type per species. 0=external (domain boundary), 1=internal (inner surface), 2=internal with ray-casting."
+          "description": "Emission type per species. 0=external (domain boundary), 1=internal (inner surface), 2=photoelectron (ray-casting), 3=secondary electron emission."
         },
         "nepl": {
           "type": "array",
@@ -1597,7 +1615,10 @@
               "pe_ray_cast": {
                 "const": true
               }
-            }
+            },
+            "required": [
+              "pe_ray_cast"
+            ]
           },
           "then": {
             "properties": {
@@ -1782,7 +1803,13 @@
         },
         "nflag_emit": {
           "type": "integer",
-          "description": "Emission type. 0=external, 1=internal, 2=ray-casting."
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "description": "Emission type. 0=external, 1=internal, 2=photoelectron (ray-casting), 3=secondary electron emission."
         },
         "ipaxyz": {
           "type": "array",
@@ -1847,10 +1874,14 @@
               "nflag_emit": {
                 "enum": [
                   1,
-                  2
+                  2,
+                  3
                 ]
               }
-            }
+            },
+            "required": [
+              "nflag_emit"
+            ]
           },
           "then": {
             "required": [

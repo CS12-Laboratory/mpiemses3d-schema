@@ -263,31 +263,31 @@
           "description": "Physical (SI-unit) plasma conditions. Used by `emu apply` to compute simulation-unit parameters. Not consumed by the solver.",
           "additionalProperties": true,
           "properties": {
-            "density": {
+            "density_m3": {
               "type": "number",
               "description": "Plasma number density [m^-3]. -> species.wp (via plasma frequency)"
             },
-            "magnetic_field": {
+            "magnetic_field_T": {
               "type": "number",
               "description": "Background magnetic field magnitude [T]. Sign indicates direction. -> plasma.wc"
             },
-            "magnetic_field_phiz": {
+            "magnetic_field_phiz_deg": {
               "type": "number",
               "description": "Magnetic field polar angle from z-axis [deg]. -> plasma.phiz"
             },
-            "magnetic_field_phixy": {
+            "magnetic_field_phixy_deg": {
               "type": "number",
               "description": "Magnetic field azimuthal angle in x-y plane [deg]. -> plasma.phixy"
             },
-            "e0x": {
+            "e0x_V_m": {
               "type": "number",
               "description": "Background electric field x-component [V/m]. -> plasma.e0x"
             },
-            "e0y": {
+            "e0y_V_m": {
               "type": "number",
               "description": "Background electric field y-component [V/m]. -> plasma.e0y"
             },
-            "e0z": {
+            "e0z_V_m": {
               "type": "number",
               "description": "Background electric field z-component [V/m]. -> plasma.e0z"
             },
@@ -331,19 +331,19 @@
           "description": "Sign of charge-to-mass ratio (-1 for electrons, +1 for ions). -> species.qm",
           "enum": [-1, 1]
         },
-        "temperature": {
+        "temperature_eV": {
           "type": "number",
           "description": "Isotropic temperature [eV]. -> species.path, species.peth"
         },
-        "path_temperature": {
+        "path_temperature_eV": {
           "type": "number",
-          "description": "Parallel (to B) temperature [eV]. Overrides temperature. -> species.path"
+          "description": "Parallel (to B) temperature [eV]. Overrides temperature_eV. -> species.path"
         },
-        "peth_temperature": {
+        "peth_temperature_eV": {
           "type": "number",
-          "description": "Perpendicular (to B) temperature [eV]. Overrides temperature. -> species.peth"
+          "description": "Perpendicular (to B) temperature [eV]. Overrides temperature_eV. -> species.peth"
         },
-        "drift_velocity": {
+        "drift_velocity_m_s": {
           "type": "number",
           "description": "Bulk drift velocity [m/s]. Sign indicates direction. -> species.vdri"
         },
@@ -351,12 +351,12 @@
           "type": "integer",
           "description": "Particles per grid cell. Overrides global value. -> species.npin"
         },
-        "emission_current_density": {
+        "emission_current_density_A_m2": {
           "type": "number",
           "description": "Emission current density [A/m^2]. -> species.curf, species.nflag_emit=2, species.npin=0"
         }
       },
-      "required": ["mass_ratio", "qm_sign", "temperature"]
+      "required": ["mass_ratio", "qm_sign", "temperature_eV"]
     },
     "meta_physical_conductor": {
       "type": "object",
@@ -367,11 +367,11 @@
           "type": "string",
           "description": "Conductor group name (key in ptcond.conductor_groups)."
         },
-        "potential": {
+        "potential_V": {
           "type": "number",
           "description": "Fixed potential [V]. -> ptcond.conductor_groups.{group}.pfixed"
         },
-        "bias_potential": {
+        "bias_potential_V": {
           "type": "number",
           "description": "Bias potential [V]. -> ptcond.conductor_groups.{group}.biasp"
         }

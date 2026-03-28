@@ -2131,7 +2131,14 @@
             "diskz",
             "plane-with-circlex",
             "plane-with-circley",
-            "plane-with-circlez"
+            "plane-with-circlez",
+            "flat-surface",
+            "rectangle-hole",
+            "dent-rectangle-hole",
+            "cylinder-hole",
+            "hyperboloid-hole",
+            "ellipsoid-hole",
+            "plane-with-circle-hole"
           ]
         },
         "boundary_conductor_id": {

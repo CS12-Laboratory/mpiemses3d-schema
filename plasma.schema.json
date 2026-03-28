@@ -97,6 +97,11 @@
       "$ref": "#/$defs/gradema_group",
       "description": "Surface charging acceleration control."
     },
+    "memo": {
+      "type": "object",
+      "description": "Free-form notes and metadata. Not consumed by the solver. Any key/value pairs are allowed.",
+      "additionalProperties": true
+    },
     "species": {
       "type": "array",
       "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
@@ -252,8 +257,126 @@
             2
           ],
           "default": 1
+        },
+        "physical": {
+          "type": "object",
+          "description": "Physical (SI-unit) plasma conditions. Used by `emu apply` to compute simulation-unit parameters. Not consumed by the solver.",
+          "additionalProperties": true,
+          "properties": {
+            "density": {
+              "type": "number",
+              "description": "Plasma number density [m^-3]. -> species.wp (via plasma frequency)"
+            },
+            "magnetic_field": {
+              "type": "number",
+              "description": "Background magnetic field magnitude [T]. Sign indicates direction. -> plasma.wc"
+            },
+            "magnetic_field_phiz": {
+              "type": "number",
+              "description": "Magnetic field polar angle from z-axis [deg]. -> plasma.phiz"
+            },
+            "magnetic_field_phixy": {
+              "type": "number",
+              "description": "Magnetic field azimuthal angle in x-y plane [deg]. -> plasma.phixy"
+            },
+            "e0x": {
+              "type": "number",
+              "description": "Background electric field x-component [V/m]. -> plasma.e0x"
+            },
+            "e0y": {
+              "type": "number",
+              "description": "Background electric field y-component [V/m]. -> plasma.e0y"
+            },
+            "e0z": {
+              "type": "number",
+              "description": "Background electric field z-component [V/m]. -> plasma.e0z"
+            },
+            "particles_per_cell": {
+              "type": "integer",
+              "description": "Default macro-particles per grid cell for all species. -> species.npin"
+            },
+            "species": {
+              "type": "array",
+              "description": "Per-species physical parameters.",
+              "items": {
+                "$ref": "#/$defs/meta_physical_species"
+              }
+            },
+            "conductors": {
+              "type": "array",
+              "description": "Per-conductor physical parameters.",
+              "items": {
+                "$ref": "#/$defs/meta_physical_conductor"
+              }
+            }
+          }
         }
       }
+    },
+    "meta_physical_species": {
+      "type": "object",
+      "description": "Physical parameters for one particle species in SI units. Index corresponds to [[species]] index.",
+      "additionalProperties": true,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label (e.g. 'electron', 'ion', 'photoelectron'). Documentation only."
+        },
+        "mass_ratio": {
+          "type": "number",
+          "description": "Mass ratio relative to electron mass (electron=1, proton=1836.15). -> species.qm"
+        },
+        "qm_sign": {
+          "type": "number",
+          "description": "Sign of charge-to-mass ratio (-1 for electrons, +1 for ions). -> species.qm",
+          "enum": [-1, 1]
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Isotropic temperature [eV]. -> species.path, species.peth"
+        },
+        "path_temperature": {
+          "type": "number",
+          "description": "Parallel (to B) temperature [eV]. Overrides temperature. -> species.path"
+        },
+        "peth_temperature": {
+          "type": "number",
+          "description": "Perpendicular (to B) temperature [eV]. Overrides temperature. -> species.peth"
+        },
+        "drift_velocity": {
+          "type": "number",
+          "description": "Bulk drift velocity [m/s]. Sign indicates direction. -> species.vdri"
+        },
+        "particles_per_cell": {
+          "type": "integer",
+          "description": "Particles per grid cell. Overrides global value. -> species.npin"
+        },
+        "emission_current_density": {
+          "type": "number",
+          "description": "Emission current density [A/m^2]. -> species.curf, species.nflag_emit=2, species.npin=0"
+        }
+      },
+      "required": ["mass_ratio", "qm_sign", "temperature"]
+    },
+    "meta_physical_conductor": {
+      "type": "object",
+      "description": "Physical parameters for one conductor group in SI units.",
+      "additionalProperties": true,
+      "properties": {
+        "group": {
+          "type": "string",
+          "description": "Conductor group name (key in ptcond.conductor_groups)."
+        },
+        "potential": {
+          "type": "number",
+          "description": "Fixed potential [V]. -> ptcond.conductor_groups.{group}.pfixed"
+        },
+        "bias_potential": {
+          "type": "number",
+          "description": "Bias potential [V]. -> ptcond.conductor_groups.{group}.biasp"
+        }
+      },
+      "required": ["group"]
     },
     "real_group": {
       "type": "object",

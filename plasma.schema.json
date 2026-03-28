@@ -499,6 +499,34 @@
         "emarlxt": {
           "type": "integer",
           "description": "External margin step count for energy analysis timing."
+        },
+        "ildig": {
+          "type": "integer",
+          "description": "Local energy diagnostic flag per species. 0=disabled."
+        },
+        "ikdiag": {
+          "type": "integer",
+          "description": "K-spectrum analysis diagnostic interval. 0=disabled."
+        },
+        "ivdiag": {
+          "type": "integer",
+          "description": "Vpara-vperp distribution function diagnostic interval. 0=disabled."
+        },
+        "imdig": {
+          "type": "integer",
+          "description": "Moment diagnostic flag per species. 0=disabled."
+        },
+        "isort": {
+          "type": "integer",
+          "description": "Particle sort interval per species [steps]. Default: 500."
+        },
+        "idim_sp": {
+          "type": "integer",
+          "description": "Spatial dimension for particle diagnostics (default: 3)."
+        },
+        "irhsp": {
+          "type": "integer",
+          "description": "Charge density output flag per species. Default: 1."
         }
       }
     },
@@ -665,6 +693,45 @@
         "separate_accumulated_and_space_charge": {
           "type": "boolean",
           "description": "Separate accumulated surface charge from space charge in the Poisson solver (default: false)."
+        },
+        "nxl": {
+          "type": "integer",
+          "description": "Left damping region width in x [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nxr": {
+          "type": "integer",
+          "description": "Right damping region width in x [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nyl": {
+          "type": "integer",
+          "description": "Left damping region width in y [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nyr": {
+          "type": "integer",
+          "description": "Right damping region width in y [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nzl": {
+          "type": "integer",
+          "description": "Left damping region width in z [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nzr": {
+          "type": "integer",
+          "description": "Right damping region width in z [grid cells]. Used when nfbnd=2. Default: 2."
+        },
+        "nflag_ecrct": {
+          "type": "integer",
+          "description": "Electrostatic field correction flag. 0=neglect, 1=apply correction. Default: 0."
+        },
+        "pftmode": {
+          "type": "integer",
+          "description": "Poisson field solver mode."
+        },
+        "mfpath": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Mean free path per species for collision modeling."
         }
       }
     },
@@ -1225,6 +1292,10 @@
           "items": {
             "$ref": "#/$defs/object_entry"
           }
+        },
+        "sfecrrct": {
+          "type": "number",
+          "description": "Surface E-field correction factor (default: 0.0). When non-zero, applies a correction to the electric field at conductor surfaces."
         }
       },
       "allOf": [
@@ -1342,6 +1413,10 @@
           "items": {
             "$ref": "#/$defs/jsrc_source_entry"
           }
+        },
+        "njs": {
+          "type": "integer",
+          "description": "Number of current sources (default: 0, max 4). Auto-computed from [[jsrc.sources]] count in format_version=2."
         }
       }
     },
@@ -1356,6 +1431,14 @@
           "items": {
             "$ref": "#/$defs/testch_charge_entry"
           }
+        },
+        "ntch": {
+          "type": "integer",
+          "description": "Number of test charges (default: 0, max 4). Auto-computed from [[testch.charges]] count in format_version=2."
+        },
+        "nqclst": {
+          "type": "integer",
+          "description": "Number of charge cluster sources (default: 0)."
         }
       }
     },
@@ -1370,6 +1453,64 @@
           "items": {
             "$ref": "#/$defs/dipole_source_entry"
           }
+        },
+        "nmd": {
+          "type": "integer",
+          "description": "Number of magnetic dipoles (maximum 10). Auto-computed from [[dipole.sources]] count in format_version=2."
+        },
+        "mode_dipole": {
+          "type": "integer",
+          "description": "Dipole mode selector. 0=disabled (default), 1=gap-fed antenna mode."
+        },
+        "ngap": {
+          "type": "integer",
+          "description": "Number of antenna gap feed points (default: 0, max 4)."
+        },
+        "w_c": {
+          "type": "number",
+          "description": "Center frequency for pulsed excitation at the gap. Negative=monochromatic."
+        },
+        "gap_amp": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Gap field amplitude per gap feed point."
+        },
+        "i_gap": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "X grid index of each gap feed point."
+        },
+        "j_gap": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Y grid index of each gap feed point."
+        },
+        "k_gap": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Z grid index of each gap feed point."
+        },
+        "resc": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Resistance at each gap feed point (default: -1.0). Negative=no resistive loading."
+        },
+        "capc": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Capacitance at each gap feed point (default: 0.0)."
         }
       }
     },

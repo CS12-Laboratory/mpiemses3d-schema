@@ -265,7 +265,7 @@
           "properties": {
             "density_m3": {
               "type": "number",
-              "description": "Plasma number density [m^-3]. -> species.wp (via plasma frequency)"
+              "description": "Default plasma number density [m^-3]. Can be overridden per species. -> species.wp (via plasma frequency)"
             },
             "magnetic_field_T": {
               "type": "number",
@@ -321,6 +321,10 @@
         "label": {
           "type": "string",
           "description": "Human-readable label (e.g. 'electron', 'ion', 'photoelectron'). Documentation only."
+        },
+        "density_m3": {
+          "type": "number",
+          "description": "Number density [m^-3] for this species. Overrides global meta.physical.density_m3. -> species.wp"
         },
         "mass_ratio": {
           "type": "number",

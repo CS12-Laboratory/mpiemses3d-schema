@@ -102,9 +102,16 @@
       "description": "Free-form notes and metadata. Not consumed by the solver. Any key/value pairs are allowed.",
       "additionalProperties": true
     },
+    "species_groups": {
+      "type": "object",
+      "description": "Named groups of default species parameters. Each `[[species]]` entry can reference a group via `group_id` to inherit its parameters. Entry-level values override group defaults.",
+      "additionalProperties": {
+        "$ref": "#/$defs/species_entry"
+      }
+    },
     "species": {
       "type": "array",
-      "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
+      "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `species_groups` entry for parameter defaults. |\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
       "items": {
         "$ref": "#/$defs/species_entry"
       }
@@ -295,11 +302,25 @@
               "type": "integer",
               "description": "Default macro-particles per grid cell for all species. -> species.npin"
             },
+            "species_groups": {
+              "type": "object",
+              "description": "Named groups of default species parameters. Each `[[meta.physical.species]]` entry can reference a group via `group_id`.",
+              "additionalProperties": {
+                "$ref": "#/$defs/meta_physical_species"
+              }
+            },
             "species": {
               "type": "array",
               "description": "Per-species physical parameters.",
               "items": {
                 "$ref": "#/$defs/meta_physical_species"
+              }
+            },
+            "conductor_groups": {
+              "type": "object",
+              "description": "Named groups of default conductor parameters. Each `[[meta.physical.conductors]]` entry can reference a group via `group_id`.",
+              "additionalProperties": {
+                "$ref": "#/$defs/meta_physical_conductor"
               }
             },
             "conductors": {
@@ -318,6 +339,10 @@
       "description": "Physical parameters for one particle species in SI units. Index corresponds to [[species]] index.",
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a species_groups entry for parameter defaults."
+        },
         "label": {
           "type": "string",
           "description": "Human-readable label (e.g. 'electron', 'ion', 'photoelectron'). Documentation only."
@@ -367,6 +392,10 @@
       "description": "Physical parameters for one conductor group in SI units.",
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a conductor_groups entry for parameter defaults."
+        },
         "group": {
           "type": "string",
           "description": "Conductor group name (key in ptcond.conductor_groups)."
@@ -1399,9 +1428,16 @@
           },
           "description": "Species ID for emitted secondary electrons (default: 1 = electron)."
         },
+        "boundary_groups": {
+          "type": "object",
+          "description": "Named groups of default boundary parameters. Each `[[ptcond.boundaries]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/boundary_entry"
+          }
+        },
         "boundaries": {
           "type": "array",
-          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
+          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `boundary_groups` entry for parameter defaults. |\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
           "items": {
             "$ref": "#/$defs/boundary_entry"
           }
@@ -1411,6 +1447,13 @@
           "description": "Conductor groups (format_version = 2). Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating (self-consistent charge accumulation),... |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when mtd_vchg = -1. |",
           "additionalProperties": {
             "$ref": "#/$defs/conductor_group_entry"
+          }
+        },
+        "object_groups": {
+          "type": "object",
+          "description": "Named groups of default object parameters. Each `[[ptcond.objects]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/object_entry"
           }
         },
         "objects": {
@@ -1534,6 +1577,13 @@
       "description": "Local oscillating current sources.",
       "additionalProperties": true,
       "properties": {
+        "source_groups": {
+          "type": "object",
+          "description": "Named groups of default source parameters. Each `[[jsrc.sources]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsrc_source_entry"
+          }
+        },
         "sources": {
           "type": "array",
           "description": "Current sources (format_version = 2). Each `[[jsrc.sources]]` entry defines one current source.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `ajs` | array | Current source amplitude [Jx, Jy, Jz] in simulation units. |\n| `rjs` | array | Current source position [x, y, z] in grid units. |\n| `th0js` | number | Current source initial phase [rad]. |\n| `wjs` | number | Current source oscillation frequency [simulation units]. |",
@@ -1552,6 +1602,13 @@
       "description": "Static or distributed test charges.",
       "additionalProperties": true,
       "properties": {
+        "charge_groups": {
+          "type": "object",
+          "description": "Named groups of default charge parameters. Each `[[testch.charges]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/testch_charge_entry"
+          }
+        },
         "charges": {
           "type": "array",
           "description": "Test charges (format_version = 2). Each `[[testch.charges]]` entry defines one test charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine ep... |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
@@ -1574,6 +1631,13 @@
       "description": "Embedded magnetic dipole sources for localized magnetic fields.",
       "additionalProperties": true,
       "properties": {
+        "source_groups": {
+          "type": "object",
+          "description": "Named groups of default source parameters. Each `[[dipole.sources]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/dipole_source_entry"
+          }
+        },
         "sources": {
           "type": "array",
           "description": "Magnetic dipole sources (format_version = 2). Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |",
@@ -1895,6 +1959,13 @@
           "$ref": "#/$defs/bool_value",
           "description": "Leave an anti-particle at the emission site per species to maintain local charge neutrality (default: true)."
         },
+        "plane_groups": {
+          "type": "object",
+          "description": "Named groups of default plane parameters. Each `[[emissn.planes]]` entry can reference a group via `group_id`.",
+          "additionalProperties": {
+            "$ref": "#/$defs/emission_plane_entry"
+          }
+        },
         "planes": {
           "type": "array",
           "description": "Explicit emission planes (format_version = 2). Each `[[emissn.planes]]` entry defines one emission plane.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curbs` | number | Backward emission current density for this plane [simulation units]. |\n| `curfs` | number | Forward emission current density for this plane [simulation units]. |\n| `dnsbs` | number | Backward macro-particle division count for this plane. |\n| `dnsfs` | number | Forward macro-particle division count for this plane. |\n| `flpbs` | number | Backward particle flux for this emission plane. |\n| `flpfs` | number | Forward particle flux for this emission plane. |\n| `ipcpl` | integer | Conductor ID coupled to this emission plane for charge conservation. |\n| `nemd` | integer | Emission normal direction. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward). |\n| `remb` | number | Backward emission region extent for this plane. |\n| `remf` | number | Forward emission region extent for this plane. |\n| `xmaxe` | number | Emission plane x-upper bound [grid units]. |\n| `xmine` | number | Emission plane x-lower bound [grid units]. |\n| `ymaxe` | number | Emission plane y-upper bound [grid units]. |\n| `ymine` | number | Emission plane y-lower bound [grid units]. |\n| `zmaxe` | number | Emission plane z-upper bound [grid units]. |\n| `zmine` | number | Emission plane z-lower bound [grid units]. |",
@@ -2079,6 +2150,10 @@
       "description": "Parameters for a single particle species (e.g. electron, ion, photoelectron).",
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a species_groups entry for parameter defaults. Entry-level values override group defaults."
+        },
         "wp": {
           "type": "number",
           "description": "Plasma frequency for this species [simulation units]."
@@ -2237,6 +2312,10 @@
       ],
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a boundary_groups entry for parameter defaults."
+        },
         "type": {
           "type": "string",
           "description": "Boundary shape type (object or surface).",
@@ -2641,6 +2720,10 @@
       ],
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to an object_groups entry for parameter defaults."
+        },
         "conductor": {
           "type": "string",
           "description": "Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups])."
@@ -2827,6 +2910,10 @@
       ],
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a plane_groups entry for parameter defaults."
+        },
         "nemd": {
           "type": "integer",
           "description": "Emission normal direction. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward)."
@@ -2907,6 +2994,10 @@
       ],
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a source_groups entry for parameter defaults."
+        },
         "md": {
           "type": "number",
           "description": "Magnetic dipole moment magnitude."
@@ -2944,6 +3035,10 @@
       "description": "A test charge definition.",
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a charge_groups entry for parameter defaults."
+        },
         "rtch": {
           "type": "array",
           "items": {
@@ -2981,6 +3076,10 @@
       "description": "A current source definition.",
       "additionalProperties": true,
       "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a source_groups entry for parameter defaults."
+        },
         "rjs": {
           "type": "array",
           "items": {

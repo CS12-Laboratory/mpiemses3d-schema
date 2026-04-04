@@ -106,9 +106,7 @@
       "type": "object",
       "description": "Named groups of default species parameters. Each `[[species]]` entry can reference a group via `group_id` to inherit its parameters. Entry-level values override group defaults.",
       "additionalProperties": {
-        "type": "object",
-        "additionalProperties": true,
-        "description": "Partial species parameter template. Required constraints are enforced only on [[species]] entries, not on group defaults."
+        "$ref": "#/$defs/species_entry_base"
       }
     },
     "species": {
@@ -308,9 +306,7 @@
               "type": "object",
               "description": "Named groups of default species parameters. Each `[[meta.physical.species]]` entry can reference a group via `group_id`.",
               "additionalProperties": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "Partial meta.physical.species template. Required constraints are enforced only on entries, not on group defaults."
+                "$ref": "#/$defs/meta_physical_species_base"
               }
             },
             "species": {
@@ -324,9 +320,7 @@
               "type": "object",
               "description": "Named groups of default conductor parameters. Each `[[meta.physical.conductors]]` entry can reference a group via `group_id`.",
               "additionalProperties": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "Partial meta.physical.conductor template. Required constraints are enforced only on entries, not on group defaults."
+                "$ref": "#/$defs/meta_physical_conductor_base"
               }
             },
             "conductors": {
@@ -340,7 +334,7 @@
         }
       }
     },
-    "meta_physical_species": {
+    "meta_physical_species_base": {
       "type": "object",
       "description": "Physical parameters for one particle species in SI units. Index corresponds to [[species]] index.",
       "additionalProperties": true,
@@ -364,7 +358,10 @@
         "qm_sign": {
           "type": "number",
           "description": "Sign of charge-to-mass ratio (-1 for electrons, +1 for ions). -> species.qm",
-          "enum": [-1, 1]
+          "enum": [
+            -1,
+            1
+          ]
         },
         "temperature_eV": {
           "type": "number",
@@ -390,15 +387,26 @@
           "type": "number",
           "description": "Emission current density [A/m^2]. -> species.curf, species.nflag_emit=2, species.npin=0"
         }
-      },
-      "if": {
-        "not": { "required": ["group_id"] }
-      },
-      "then": {
-        "required": ["mass_ratio", "qm_sign", "temperature_eV"]
       }
     },
-    "meta_physical_conductor": {
+    "meta_physical_species": {
+      "$ref": "#/$defs/meta_physical_species_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "mass_ratio",
+          "qm_sign",
+          "temperature_eV"
+        ]
+      }
+    },
+    "meta_physical_conductor_base": {
       "type": "object",
       "description": "Physical parameters for one conductor group in SI units.",
       "additionalProperties": true,
@@ -419,12 +427,21 @@
           "type": "number",
           "description": "Bias potential [V]. -> ptcond.conductor_groups.{group}.biasp"
         }
-      },
+      }
+    },
+    "meta_physical_conductor": {
+      "$ref": "#/$defs/meta_physical_conductor_base",
       "if": {
-        "not": { "required": ["group_id"] }
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
       },
       "then": {
-        "required": ["group"]
+        "required": [
+          "group"
+        ]
       }
     },
     "real_group": {
@@ -1448,9 +1465,7 @@
           "type": "object",
           "description": "Named groups of default boundary parameters. Each `[[ptcond.boundaries]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial boundary template. Required constraints are enforced only on [[ptcond.boundaries]] entries, not on group defaults."
+            "$ref": "#/$defs/boundary_entry_base"
           }
         },
         "boundaries": {
@@ -1471,9 +1486,7 @@
           "type": "object",
           "description": "Named groups of default object parameters. Each `[[ptcond.objects]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial object template. Required constraints are enforced only on [[ptcond.objects]] entries, not on group defaults."
+            "$ref": "#/$defs/object_entry_base"
           }
         },
         "objects": {
@@ -1601,9 +1614,7 @@
           "type": "object",
           "description": "Named groups of default source parameters. Each `[[jsrc.sources]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial current source template. Required constraints are enforced only on [[jsrc.sources]] entries, not on group defaults."
+            "$ref": "#/$defs/jsrc_source_entry_base"
           }
         },
         "sources": {
@@ -1628,9 +1639,7 @@
           "type": "object",
           "description": "Named groups of default charge parameters. Each `[[testch.charges]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial test charge template. Required constraints are enforced only on [[testch.charges]] entries, not on group defaults."
+            "$ref": "#/$defs/testch_charge_entry_base"
           }
         },
         "charges": {
@@ -1659,9 +1668,7 @@
           "type": "object",
           "description": "Named groups of default source parameters. Each `[[dipole.sources]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial dipole source template. Required constraints are enforced only on [[dipole.sources]] entries, not on group defaults."
+            "$ref": "#/$defs/dipole_source_entry_base"
           }
         },
         "sources": {
@@ -1989,9 +1996,7 @@
           "type": "object",
           "description": "Named groups of default plane parameters. Each `[[emissn.planes]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Partial emission plane template. Required constraints are enforced only on [[emissn.planes]] entries, not on group defaults."
+            "$ref": "#/$defs/emission_plane_entry_base"
           }
         },
         "planes": {
@@ -2173,7 +2178,7 @@
         }
       }
     },
-    "species_entry": {
+    "species_entry_base": {
       "type": "object",
       "description": "Parameters for a single particle species (e.g. electron, ion, photoelectron).",
       "additionalProperties": true,
@@ -2306,7 +2311,10 @@
           "type": "number",
           "description": "Maximum energy change per species."
         }
-      },
+      }
+    },
+    "species_entry": {
+      "$ref": "#/$defs/species_entry_base",
       "allOf": [
         {
           "description": "Per-species parameters (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
@@ -2323,7 +2331,11 @@
             "required": [
               "nflag_emit"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2333,15 +2345,9 @@
         }
       ]
     },
-    "boundary_entry": {
+    "boundary_entry_base": {
       "type": "object",
       "description": "A single boundary element for complex mode.",
-      "if": {
-        "not": { "required": ["group_id"] }
-      },
-      "then": {
-        "required": ["type"]
-      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -2566,6 +2572,21 @@
           },
           "description": "Species ID of emitted secondary electrons per species (default: 1)."
         }
+      }
+    },
+    "boundary_entry": {
+      "$ref": "#/$defs/boundary_entry_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "type"
+        ]
       },
       "allOf": [
         {
@@ -2580,7 +2601,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2601,7 +2626,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2621,7 +2650,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2644,7 +2677,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2670,7 +2707,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2694,7 +2735,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2719,7 +2764,11 @@
             "required": [
               "type"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2750,15 +2799,9 @@
         }
       ]
     },
-    "object_entry": {
+    "object_entry_base": {
       "type": "object",
       "description": "A solid conductor object with geometry and group assignment.",
-      "if": {
-        "not": { "required": ["group_id"] }
-      },
-      "then": {
-        "required": ["conductor", "geotype"]
-      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -2875,6 +2918,22 @@
           "maxItems": 3,
           "description": "Wire origin coordinates [x, y, z] in grid units."
         }
+      }
+    },
+    "object_entry": {
+      "$ref": "#/$defs/object_entry_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "conductor",
+          "geotype"
+        ]
       },
       "allOf": [
         {
@@ -2890,7 +2949,11 @@
             "required": [
               "geotype"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2914,7 +2977,11 @@
             "required": [
               "geotype"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2935,7 +3002,11 @@
             "required": [
               "geotype"
             ],
-            "not": { "required": ["group_id"] }
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
           },
           "then": {
             "required": [
@@ -2946,15 +3017,9 @@
         }
       ]
     },
-    "emission_plane_entry": {
+    "emission_plane_entry_base": {
       "type": "object",
       "description": "An explicit emission plane definition.",
-      "if": {
-        "not": { "required": ["group_id"] }
-      },
-      "then": {
-        "required": ["nemd"]
-      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -3025,6 +3090,21 @@
           "type": "number",
           "description": "Backward emission region extent for this plane."
         }
+      }
+    },
+    "emission_plane_entry": {
+      "$ref": "#/$defs/emission_plane_entry_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "nemd"
+        ]
       },
       "allOf": [
         {
@@ -3032,15 +3112,9 @@
         }
       ]
     },
-    "dipole_source_entry": {
+    "dipole_source_entry_base": {
       "type": "object",
       "description": "A magnetic dipole source.",
-      "if": {
-        "not": { "required": ["group_id"] }
-      },
-      "then": {
-        "required": ["md", "mddir"]
-      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -3072,6 +3146,22 @@
           ],
           "description": "Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis."
         }
+      }
+    },
+    "dipole_source_entry": {
+      "$ref": "#/$defs/dipole_source_entry_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "md",
+          "mddir"
+        ]
       },
       "allOf": [
         {
@@ -3079,7 +3169,7 @@
         }
       ]
     },
-    "testch_charge_entry": {
+    "testch_charge_entry_base": {
       "type": "object",
       "description": "A test charge definition.",
       "additionalProperties": true,
@@ -3113,14 +3203,17 @@
           "type": "number",
           "description": "Cutoff radius for the test charge potential [grid units]. Default: machine epsilon."
         }
-      },
+      }
+    },
+    "testch_charge_entry": {
+      "$ref": "#/$defs/testch_charge_entry_base",
       "allOf": [
         {
           "description": "Test charge. Each `[[testch.charges]]` entry defines one charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine ep... |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |"
         }
       ]
     },
-    "jsrc_source_entry": {
+    "jsrc_source_entry_base": {
       "type": "object",
       "description": "A current source definition.",
       "additionalProperties": true,
@@ -3155,7 +3248,10 @@
           "type": "number",
           "description": "Current source initial phase [rad]."
         }
-      },
+      }
+    },
+    "jsrc_source_entry": {
+      "$ref": "#/$defs/jsrc_source_entry_base",
       "allOf": [
         {
           "description": "Current source. Each `[[jsrc.sources]]` entry defines one source.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `ajs` | array | Current source amplitude [Jx, Jy, Jz] in simulation units. |\n| `rjs` | array | Current source position [x, y, z] in grid units. |\n| `th0js` | number | Current source initial phase [rad]. |\n| `wjs` | number | Current source oscillation frequency [simulation units]. |"

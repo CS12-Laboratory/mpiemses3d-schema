@@ -106,7 +106,9 @@
       "type": "object",
       "description": "Named groups of default species parameters. Each `[[species]]` entry can reference a group via `group_id` to inherit its parameters. Entry-level values override group defaults.",
       "additionalProperties": {
-        "$ref": "#/$defs/species_entry"
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Partial species parameter template. Required constraints are enforced only on [[species]] entries, not on group defaults."
       }
     },
     "species": {
@@ -306,7 +308,9 @@
               "type": "object",
               "description": "Named groups of default species parameters. Each `[[meta.physical.species]]` entry can reference a group via `group_id`.",
               "additionalProperties": {
-                "$ref": "#/$defs/meta_physical_species"
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Partial meta.physical.species template. Required constraints are enforced only on entries, not on group defaults."
               }
             },
             "species": {
@@ -320,7 +324,9 @@
               "type": "object",
               "description": "Named groups of default conductor parameters. Each `[[meta.physical.conductors]]` entry can reference a group via `group_id`.",
               "additionalProperties": {
-                "$ref": "#/$defs/meta_physical_conductor"
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Partial meta.physical.conductor template. Required constraints are enforced only on entries, not on group defaults."
               }
             },
             "conductors": {
@@ -385,7 +391,12 @@
           "description": "Emission current density [A/m^2]. -> species.curf, species.nflag_emit=2, species.npin=0"
         }
       },
-      "required": ["mass_ratio", "qm_sign", "temperature_eV"]
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["mass_ratio", "qm_sign", "temperature_eV"]
+      }
     },
     "meta_physical_conductor": {
       "type": "object",
@@ -409,7 +420,12 @@
           "description": "Bias potential [V]. -> ptcond.conductor_groups.{group}.biasp"
         }
       },
-      "required": ["group"]
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["group"]
+      }
     },
     "real_group": {
       "type": "object",
@@ -1432,7 +1448,9 @@
           "type": "object",
           "description": "Named groups of default boundary parameters. Each `[[ptcond.boundaries]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/boundary_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial boundary template. Required constraints are enforced only on [[ptcond.boundaries]] entries, not on group defaults."
           }
         },
         "boundaries": {
@@ -1453,7 +1471,9 @@
           "type": "object",
           "description": "Named groups of default object parameters. Each `[[ptcond.objects]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/object_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial object template. Required constraints are enforced only on [[ptcond.objects]] entries, not on group defaults."
           }
         },
         "objects": {
@@ -1581,7 +1601,9 @@
           "type": "object",
           "description": "Named groups of default source parameters. Each `[[jsrc.sources]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/jsrc_source_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial current source template. Required constraints are enforced only on [[jsrc.sources]] entries, not on group defaults."
           }
         },
         "sources": {
@@ -1606,7 +1628,9 @@
           "type": "object",
           "description": "Named groups of default charge parameters. Each `[[testch.charges]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/testch_charge_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial test charge template. Required constraints are enforced only on [[testch.charges]] entries, not on group defaults."
           }
         },
         "charges": {
@@ -1635,7 +1659,9 @@
           "type": "object",
           "description": "Named groups of default source parameters. Each `[[dipole.sources]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/dipole_source_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial dipole source template. Required constraints are enforced only on [[dipole.sources]] entries, not on group defaults."
           }
         },
         "sources": {
@@ -1963,7 +1989,9 @@
           "type": "object",
           "description": "Named groups of default plane parameters. Each `[[emissn.planes]]` entry can reference a group via `group_id`.",
           "additionalProperties": {
-            "$ref": "#/$defs/emission_plane_entry"
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Partial emission plane template. Required constraints are enforced only on [[emissn.planes]] entries, not on group defaults."
           }
         },
         "planes": {
@@ -2294,7 +2322,8 @@
             },
             "required": [
               "nflag_emit"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2307,9 +2336,12 @@
     "boundary_entry": {
       "type": "object",
       "description": "A single boundary element for complex mode.",
-      "required": [
-        "type"
-      ],
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["type"]
+      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -2547,7 +2579,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2567,7 +2600,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2586,7 +2620,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2608,7 +2643,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2633,7 +2669,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2656,7 +2693,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2680,7 +2718,8 @@
             },
             "required": [
               "type"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2714,10 +2753,12 @@
     "object_entry": {
       "type": "object",
       "description": "A solid conductor object with geometry and group assignment.",
-      "required": [
-        "conductor",
-        "geotype"
-      ],
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["conductor", "geotype"]
+      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -2848,7 +2889,8 @@
             },
             "required": [
               "geotype"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2871,7 +2913,8 @@
             },
             "required": [
               "geotype"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2891,7 +2934,8 @@
             },
             "required": [
               "geotype"
-            ]
+            ],
+            "not": { "required": ["group_id"] }
           },
           "then": {
             "required": [
@@ -2905,9 +2949,12 @@
     "emission_plane_entry": {
       "type": "object",
       "description": "An explicit emission plane definition.",
-      "required": [
-        "nemd"
-      ],
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["nemd"]
+      },
       "additionalProperties": true,
       "properties": {
         "group_id": {
@@ -2988,10 +3035,12 @@
     "dipole_source_entry": {
       "type": "object",
       "description": "A magnetic dipole source.",
-      "required": [
-        "md",
-        "mddir"
-      ],
+      "if": {
+        "not": { "required": ["group_id"] }
+      },
+      "then": {
+        "required": ["md", "mddir"]
+      },
       "additionalProperties": true,
       "properties": {
         "group_id": {

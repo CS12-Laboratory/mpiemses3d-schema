@@ -1396,7 +1396,7 @@
         },
         "modeww": {
           "type": "integer",
-          "description": "Capacitance matrix mode. |modeww|=1: no capacitance matrix (surface_charge skipped), |modeww|=2: capacitance matrix method, |modeww|=3: distributed capacitance matrix. Sign: >0 ignore charge accumulation, <0 include charge accumulation."
+          "description": "Capacitance matrix mode. |modeww|=1: no capacitance matrix (surface_charge skipped), |modeww|=2: build capacitance matrix from scratch, |modeww|=3: read distributed capacitance matrix from capacity_matrix.h5, |modeww|=4: distributed build with root-rank inversion followed by distributed reload, |modeww|=5: distributed build with distributed LU/solve backend. Sign: >0 ignore charge accumulation, <0 include charge accumulation."
         },
         "conductivity": {
           "type": "array",

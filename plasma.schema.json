@@ -1394,9 +1394,19 @@
           },
           "description": "Potential treatment method per conductor group. 0=floating, -1=fixed potential."
         },
+        "capacity_matrix_mode": {
+          "type": "integer",
+          "enum": [1, 2, 3, 4, 5],
+          "description": "Capacity matrix computation method. 1: no capacitance matrix (surface_charge skipped), 2: build capacitance matrix from scratch, 3: read precomputed capacitance matrix from capacity_matrix.h5, 4: distributed build with root-rank inversion followed by distributed reload, 5: distributed build with distributed LU/solve backend. Auto-derived from abs(modeww) when unset."
+        },
+        "charge_accumulation": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Whether to include charge accumulation on conductor surfaces. 1: considered, 0: not considered. Auto-derived from sign of modeww when unset."
+        },
         "modeww": {
           "type": "integer",
-          "description": "Capacitance matrix mode. |modeww|=1: no capacitance matrix (surface_charge skipped), |modeww|=2: build capacitance matrix from scratch, |modeww|=3: read distributed capacitance matrix from capacity_matrix.h5, |modeww|=4: distributed build with root-rank inversion followed by distributed reload, |modeww|=5: distributed build with distributed LU/solve backend. Sign: >0 ignore charge accumulation, <0 include charge accumulation."
+          "description": "Deprecated. Capacity matrix mode retained for backward compatibility. abs(modeww) maps to capacity_matrix_mode; modeww<0 maps to charge_accumulation=1; modeww>0 maps to charge_accumulation=0. When capacity_matrix_mode and charge_accumulation are explicitly set, they take precedence."
         },
         "conductivity": {
           "type": "array",

@@ -661,6 +661,13 @@
           },
           "description": "Current output flags (4-element array). [Jx, Jy, Jz, rho]. 1=output, 0=skip."
         },
+        "iTxyz": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Kinetic temperature output flags (7-element array, per species). [T_iso, T_xx, T_yy, T_zz, T_xy, T_xz, T_yz]. 1=output, 0=skip. Default [1,0,0,0,0,0,0] = isotropic scalar only. Internal storage is minimized based on flags: L1 (scalar) < L2 (diagonal) < L3 (full tensor)."
+        },
         "nvx": {
           "type": "integer",
           "description": "Number of velocity-space bins in x for distribution function diagnostics."

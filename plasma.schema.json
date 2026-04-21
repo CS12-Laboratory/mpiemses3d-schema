@@ -526,7 +526,7 @@
             1,
             2
           ],
-          "description": "Field solver mode. 0 = Electrostatic (Poisson) — no magnetic field evolution, CFL violations are warnings only. 1 = Full electromagnetic (Maxwell) — CFL condition strictly enforced. 2 = CoToCoA mode."
+          "description": "Field solver mode. 0 = Electrostatic (Poisson) — no magnetic field evolution, CFL violations are warnings only. 1 = Full electromagnetic (Maxwell) — CFL condition strictly enforced. 2 = legacy implicit EM (`imses`) path. CoToCoA requester/worker builds replace the emflag=0 electrostatic path and are not selected by emflag=2."
         },
         "nflag_testp": {
           "type": "integer",

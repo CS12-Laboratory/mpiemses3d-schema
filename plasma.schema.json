@@ -2126,7 +2126,7 @@
           "items": {
             "type": "integer"
           },
-          "description": "Number of MPI process divisions along [x, y, z]. Total processes = nodes[0] * nodes[1] * nodes[2]."
+          "description": "Number of MPI process divisions along [x, y, z]. Total processes = nodes[0] * nodes[1] * nodes[2], and must match the runtime MPI communicator size."
         }
       }
     },

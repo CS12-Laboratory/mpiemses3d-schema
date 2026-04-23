@@ -1182,6 +1182,7 @@
             "type": "string",
             "enum": [
               "rectangle",
+              "rectangle-corners",
               "circlex",
               "circley",
               "circlez",
@@ -1271,7 +1272,20 @@
               "type": "number"
             }
           },
-          "description": "Rectangular plane extents: [xmin, xmax, ymin, ymax, zmin, zmax] per sub-boundary."
+          "description": "Axis-aligned rectangular plane extents: [xmin, xmax, ymin, ymax, zmin, zmax] per sub-boundary. One axis pair should be degenerate."
+        },
+        "rectangle_corners": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "description": "Four-corner rectangle coordinates stored as [coordinate][corner][sub-boundary]."
         },
         "circle_origin": {
           "type": "array",
@@ -2376,6 +2390,7 @@
           "description": "Boundary shape type (object or surface).",
           "enum": [
             "rectangle",
+            "rectangle-corners",
             "circlex",
             "circley",
             "circlez",
@@ -2413,7 +2428,21 @@
           },
           "minItems": 6,
           "maxItems": 6,
-          "description": "Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degenerate)."
+          "description": "Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate."
+        },
+        "rectangle_corners": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units."
         },
         "cuboid_shape": {
           "type": "array",
@@ -2630,6 +2659,30 @@
             ]
           },
           "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "rectangle-corners"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "not": {
+              "required": [
+                "group_id"
+              ]
+            }
+          },
+          "then": {
+            "required": [
+              "rectangle_corners"
+            ]
+          }
         },
         {
           "if": {

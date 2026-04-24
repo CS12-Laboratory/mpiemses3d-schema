@@ -597,9 +597,17 @@
           "type": "integer",
           "description": "Field diagnostic output interval. 0=no output."
         },
+        "field_output_interval": {
+          "type": "integer",
+          "description": "Field diagnostic output interval. Canonical alias for legacy ifdiag. 0=no output."
+        },
         "ijdiag": {
           "type": "integer",
           "description": "Current diagnostic output interval. 0=no output."
+        },
+        "current_output_interval": {
+          "type": "integer",
+          "description": "Current diagnostic output interval. Canonical alias for legacy ijdiag. 0=no output."
         },
         "iediag": {
           "type": "integer",
@@ -619,15 +627,27 @@
         },
         "intfoc": {
           "type": "integer",
-          "description": "Number of main loop repetitions between diagnostic outputs. Should be an integer multiple of mltstp."
+          "description": "Number of main loop repetitions between diagnostic outputs. Should be an integer multiple of field_substeps_per_particle_step (legacy mltstp)."
+        },
+        "diagnostic_interval": {
+          "type": "integer",
+          "description": "Number of main loop repetitions between text diagnostic outputs. Canonical alias for legacy intfoc."
         },
         "itchck": {
           "type": "integer",
           "description": "Number of main loop repetitions between CPU time checks (see maxt)."
         },
+        "walltime_check_interval": {
+          "type": "integer",
+          "description": "Number of main loop repetitions between wall-clock time checks. Canonical alias for legacy itchck."
+        },
         "daverg": {
           "type": "integer",
           "description": "Time-averaging factor for field diagnostics. 0=instantaneous, >0=averaged over daverg steps."
+        },
+        "field_average_window": {
+          "type": "integer",
+          "description": "Time-averaging factor for field diagnostics. Canonical alias for legacy daverg. 0=instantaneous."
         },
         "ipahdf": {
           "type": "array",
@@ -636,6 +656,13 @@
           },
           "description": "HDF5 particle data skip factor per species. 0=no output."
         },
+        "particle_hdf5_stride": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "HDF5 particle data skip factor per species. Canonical alias for legacy ipahdf. 0=no output."
+        },
         "ipadig": {
           "type": "array",
           "items": {
@@ -643,23 +670,48 @@
           },
           "description": "Particle diagnostic output interval per species. 0=no output."
         },
+        "particle_output_interval": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Particle diagnostic output interval per species. Canonical alias for legacy ipadig. 0=no output."
+        },
         "ipaxyz": {
           "$ref": "#/$defs/int_value",
           "description": "Particle data storage flags (7-element array per species). Elements: [x, y, z, vx, vy, vz, trace_id]."
+        },
+        "particle_output_flags": {
+          "$ref": "#/$defs/int_value",
+          "description": "Particle data storage flags (7-element array per species). Canonical alias for legacy ipaxyz. Elements: [x, y, z, vx, vy, vz, trace_id]."
         },
         "ifxyz": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field output flags (7-element array). [Ex, Ey, Ez, Bx, By, Bz, phi]. 1=output, 0=skip."
+          "description": "Field output flags (7-element array). [Ex, Ey, Ez, Bx, By, Bz, rho/phi scalar outputs]. 1=output, 0=skip."
+        },
+        "field_output_flags": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Field output flags (7-element array). Canonical alias for legacy ifxyz. [Ex, Ey, Ez, Bx, By, Bz, rho/phi scalar outputs]. 1=output, 0=skip."
         },
         "ijxyz": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Current output flags (4-element array). [Jx, Jy, Jz, rho]. 1=output, 0=skip."
+          "description": "Current output flags (4-element array). [Jx, Jy, Jz, JS]. 1=output, 0=skip."
+        },
+        "current_output_flags": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Current output flags (4-element array). Canonical alias for legacy ijxyz. [Jx, Jy, Jz, JS]. 1=output, 0=skip."
         },
         "iTxyz": {
           "type": "array",
@@ -667,6 +719,13 @@
             "type": "integer"
           },
           "description": "Kinetic temperature output flags (7-element array, per species). [T_iso, T_xx, T_yy, T_zz, T_xy, T_xz, T_yz]. 1=output, 0=skip. Default [1,0,0,0,0,0,0] = isotropic scalar only. Internal storage is minimized based on flags: L1 (scalar) < L2 (diagonal) < L3 (full tensor)."
+        },
+        "kinetic_temperature_output_flags": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Kinetic temperature output flags (7-element array, per species). Canonical alias for legacy iTxyz. [T_iso, T_xx, T_yy, T_zz, T_xy, T_xz, T_yz]. 1=output, 0=skip."
         },
         "nvx": {
           "type": "integer",
@@ -724,7 +783,97 @@
           "type": "integer",
           "description": "Charge density output flag per species. Default: 1."
         }
-      }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "ifdiag",
+              "field_output_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ijdiag",
+              "current_output_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "intfoc",
+              "diagnostic_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "itchck",
+              "walltime_check_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "daverg",
+              "field_average_window"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipahdf",
+              "particle_hdf5_stride"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipadig",
+              "particle_output_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipaxyz",
+              "particle_output_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ifxyz",
+              "field_output_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ijxyz",
+              "current_output_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "iTxyz",
+              "kinetic_temperature_output_flags"
+            ]
+          }
+        }
+      ]
     },
     "plasma_group": {
       "type": "object",
@@ -839,52 +988,52 @@
         },
         "mltstp": {
           "type": "integer",
-          "description": "Multiple time step ratio: number of field update sub-steps per particle push step (default: 1)."
+          "description": "Multiple time step ratio: number of field update sub-steps per particle push step (default: 1). Legacy spelling for field_substeps_per_particle_step."
         },
         "mltstpf": {
           "type": "integer",
-          "description": "Field sub-step factor for the implicit solver (default: 1). Used with mltstp for EM mode."
+          "description": "Field sub-step factor for the implicit solver (default: 1). Used with mltstp for EM mode. Legacy spelling for implicit_field_substep_factor."
         },
         "juncan": {
           "type": "integer",
-          "description": "Uniform current cancellation. 0=off, 1=subtract uniform current, 2=also skip ES component, -2=skip ES only. >=1000 = test particle mode (wave field given externally)."
+          "description": "Uniform current cancellation. 0=off, 1=subtract uniform current, 2=also skip ES component, -2=skip ES only. >=1000 = test particle mode (wave field given externally). Legacy spelling for current_cancellation_mode."
         },
         "ionchg": {
           "type": "integer",
-          "description": "Background ion charge option. 0=uniform neutralization across system, 1=local neutralization at each grid point."
+          "description": "Background ion charge option. 0=uniform neutralization across system, 1=local neutralization at each grid point. Legacy spelling for background_ion_charge_mode."
         },
         "nfbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free (absorbing), 2=damping (wave-absorbing layer)."
+          "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free (absorbing), 2=damping (wave-absorbing layer). Legacy spelling for field_boundary_mode."
         },
         "npbnd": {
           "$ref": "#/$defs/int_value",
-          "description": "Particle boundary condition per axis per species (3 x nspec). 0=periodic, 1=reflective, 2=free (escape/inject), -1=follow nfbnd."
+          "description": "Particle boundary condition per axis per species (3 x nspec). 0=periodic, 1=reflective, 2=free (escape/inject), -1=follow field_boundary_mode (legacy nfbnd). Legacy spelling for particle_boundary_mode."
         },
         "mtd_vbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Potential boundary method per axis [x,y,z]. 0=periodic, 1=Dirichlet (fixed), 2=Neumann (zero gradient), 3=open/free-space (doubles FFT grid)."
+          "description": "Potential boundary method per axis [x,y,z]. 0=periodic, 1=Dirichlet (fixed), 2=Neumann (zero gradient), 3=open/free-space (doubles FFT grid). Legacy spelling for potential_boundary_mode."
         },
         "boundary_conditions": {
           "$ref": "#/$defs/num_value",
-          "description": "Boundary condition values as [lower, upper] per axis (2x3 array). Interpretation depends on nfbnd/mtd_vbnd settings."
+          "description": "Boundary condition values as [lower, upper] per axis (2x3 array). Interpretation depends on field_boundary_mode (legacy nfbnd) and potential_boundary_mode (legacy mtd_vbnd) settings."
         },
         "iphiref": {
           "$ref": "#/$defs/int_value",
-          "description": "Reference point indices for potential solver (2x3 array: [lower,upper] per axis)."
+          "description": "Reference point indices for potential solver (2x3 array: [lower,upper] per axis). Legacy spelling for potential_reference_indices."
         },
         "imask": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Field component mask (7-element array). Selects which components to zero: [B-field, E-trans, E-long, current, charge, unused, unused]. 0=keep, 1=mask."
+          "description": "Field component mask (7-element array). Selects which components to zero: [B-field, E-trans, E-long, current, charge, unused, unused]. 0=keep, 1=mask. Legacy spelling for field_mask_flags."
         },
         "separate_accumulated_and_space_charge": {
           "type": "boolean",
@@ -892,35 +1041,35 @@
         },
         "nxl": {
           "type": "integer",
-          "description": "Left damping region width in x [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Left damping region width in x [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nxr": {
           "type": "integer",
-          "description": "Right damping region width in x [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Right damping region width in x [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nyl": {
           "type": "integer",
-          "description": "Left damping region width in y [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Left damping region width in y [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nyr": {
           "type": "integer",
-          "description": "Right damping region width in y [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Right damping region width in y [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nzl": {
           "type": "integer",
-          "description": "Left damping region width in z [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Left damping region width in z [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nzr": {
           "type": "integer",
-          "description": "Right damping region width in z [grid cells]. Used when nfbnd=2. Default: 2."
+          "description": "Right damping region width in z [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."
         },
         "nflag_ecrct": {
           "type": "integer",
-          "description": "Electrostatic field correction flag. 0=neglect, 1=apply correction. Default: 0."
+          "description": "Electrostatic field correction flag. 0=neglect, 1=apply correction. Default: 0. Legacy spelling for electrostatic_correction_mode."
         },
         "pftmode": {
           "type": "integer",
-          "description": "Poisson field solver mode."
+          "description": "Poisson field solver mode. Legacy spelling for poisson_solver_mode."
         },
         "mfpath": {
           "type": "array",
@@ -928,8 +1077,151 @@
             "type": "number"
           },
           "description": "Mean free path per species for collision modeling."
+        },
+        "field_substeps_per_particle_step": {
+          "type": "integer",
+          "description": "Number of field update sub-steps per particle push step. Canonical alias for legacy mltstp. Default: 1."
+        },
+        "implicit_field_substep_factor": {
+          "type": "integer",
+          "description": "Field sub-step factor for the implicit solver. Canonical alias for legacy mltstpf. Default: 1."
+        },
+        "current_cancellation_mode": {
+          "type": "integer",
+          "description": "Uniform current cancellation mode. Canonical alias for legacy juncan. >=1000 enables test-particle mode."
+        },
+        "background_ion_charge_mode": {
+          "type": "integer",
+          "description": "Background ion charge mode. Canonical alias for legacy ionchg. 0=uniform neutralization, 1=local neutralization."
+        },
+        "field_boundary_mode": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Field boundary condition per axis [x,y,z]. Canonical alias for legacy nfbnd. 0=periodic, 1=free, 2=damping."
+        },
+        "field_mask_flags": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Field component mask flags. Canonical alias for legacy imask. [B-field, E-trans, E-long, current, charge, unused, unused]."
+        },
+        "particle_boundary_mode": {
+          "$ref": "#/$defs/int_value",
+          "description": "Particle boundary condition per axis per species. Canonical alias for legacy npbnd."
+        },
+        "electrostatic_correction_mode": {
+          "type": "integer",
+          "description": "Electrostatic field correction mode. Canonical alias for legacy nflag_ecrct. 0=neglect, 1=apply correction."
+        },
+        "poisson_solver_mode": {
+          "type": "integer",
+          "description": "Poisson field solver mode. Canonical alias for legacy pftmode."
+        },
+        "potential_boundary_mode": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Potential boundary method per axis [x,y,z]. Canonical alias for legacy mtd_vbnd."
+        },
+        "potential_reference_indices": {
+          "$ref": "#/$defs/int_value",
+          "description": "Reference point indices for potential solver. Canonical alias for legacy iphiref."
         }
-      }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "mltstp",
+              "field_substeps_per_particle_step"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "mltstpf",
+              "implicit_field_substep_factor"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "juncan",
+              "current_cancellation_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ionchg",
+              "background_ion_charge_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "nfbnd",
+              "field_boundary_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "imask",
+              "field_mask_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npbnd",
+              "particle_boundary_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "nflag_ecrct",
+              "electrostatic_correction_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "pftmode",
+              "poisson_solver_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "mtd_vbnd",
+              "potential_boundary_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "iphiref",
+              "potential_reference_indices"
+            ]
+          }
+        }
+      ]
     },
     "intp_group": {
       "type": "object",
@@ -1131,30 +1423,92 @@
           "items": {
             "type": "integer"
           },
-          "description": "Injection flag at lower x-boundary per species. 0=no injection, 1=inject."
+          "description": "Injection flag at lower x-boundary per species. 0=no injection, 1=inject. Legacy spelling for lower_x_boundary_injection_enabled."
         },
         "inpb": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Injection flag at upper x-boundary per species. 0=no injection, 1=inject."
+          "description": "Injection flag at upper x-boundary per species. 0=no injection, 1=inject. Legacy spelling for upper_x_boundary_injection_enabled."
         },
         "injct": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Time step interval between continuous injections per species. 0=disable periodic injection."
+          "description": "Time step interval between continuous injections per species. 0=disable periodic injection. Legacy spelling for injection_interval."
         },
         "npr": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Number of standard-distribution samples for injection particle generation."
+          "description": "Number of standard-distribution samples for injection particle generation. Legacy spelling for injection_sample_count."
+        },
+        "lower_x_boundary_injection_enabled": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Injection flag at lower x-boundary per species. Canonical alias for legacy inpf. 0=no injection, 1=inject."
+        },
+        "upper_x_boundary_injection_enabled": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Injection flag at upper x-boundary per species. Canonical alias for legacy inpb. 0=no injection, 1=inject."
+        },
+        "injection_interval": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Time step interval between continuous injections per species. Canonical alias for legacy injct. 0=disable periodic injection."
+        },
+        "injection_sample_count": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Number of standard-distribution samples for injection particle generation. Canonical alias for legacy npr."
         }
-      }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "inpf",
+              "lower_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "inpb",
+              "upper_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "injct",
+              "injection_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npr",
+              "injection_sample_count"
+            ]
+          }
+        }
+      ]
     },
     "ptcond_group": {
       "type": "object",
@@ -1417,12 +1771,21 @@
         },
         "capacity_matrix_mode": {
           "type": "integer",
-          "enum": [1, 2, 3, 4, 5],
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
           "description": "Capacity matrix computation method. 1: no capacitance matrix (surface_charge skipped), 2: build capacitance matrix from scratch, 3: read precomputed capacitance matrix from capacity_matrix.h5, 4: distributed build with root-rank inversion followed by distributed reload, 5: distributed build with distributed LU/solve backend. Auto-derived from abs(modeww) when unset."
         },
         "charge_accumulation": {
           "type": "integer",
-          "enum": [0, 1],
+          "enum": [
+            0,
+            1
+          ],
           "description": "Whether to include charge accumulation on conductor surfaces. 1: considered, 0: not considered. Auto-derived from sign of modeww when unset."
         },
         "modeww": {
@@ -2256,19 +2619,19 @@
         },
         "inpf": {
           "type": "integer",
-          "description": "Injection flag at lower domain boundary. 0=no injection, 1=inject."
+          "description": "Injection flag at lower domain boundary. 0=no injection, 1=inject. Legacy spelling for lower_x_boundary_injection_enabled."
         },
         "inpb": {
           "type": "integer",
-          "description": "Injection flag at upper domain boundary. 0=no injection, 1=inject."
+          "description": "Injection flag at upper domain boundary. 0=no injection, 1=inject. Legacy spelling for upper_x_boundary_injection_enabled."
         },
         "injct": {
           "type": "integer",
-          "description": "Injection interval [steps]. 0=no periodic injection, >0=inject every injct steps."
+          "description": "Injection interval [steps]. 0=no periodic injection, >0=inject every injct steps. Legacy spelling for injection_interval."
         },
         "npr": {
           "type": "integer",
-          "description": "Number of standard-distribution samples for injection particle generation per species."
+          "description": "Number of standard-distribution samples for injection particle generation per species. Legacy spelling for injection_sample_count."
         },
         "curf": {
           "type": "number",
@@ -2297,20 +2660,37 @@
           "minItems": 7,
           "maxItems": 7
         },
+        "particle_output_flags": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Particle data storage flags (7-element array). Canonical alias for legacy ipaxyz: [x, y, z, vx, vy, vz, trace_id]. 1=store, 0=skip.",
+          "minItems": 7,
+          "maxItems": 7
+        },
         "ipadig": {
           "type": "integer",
           "description": "Particle diagnostic output interval. 0=no particle output for this species."
         },
+        "particle_output_interval": {
+          "type": "integer",
+          "description": "Particle diagnostic output interval. Canonical alias for legacy ipadig. 0=no particle output for this species."
+        },
         "ipahdf": {
           "type": "integer",
           "description": "HDF5 particle data skip factor. 0=no HDF5 output for this species."
+        },
+        "particle_hdf5_stride": {
+          "type": "integer",
+          "description": "HDF5 particle data skip factor. Canonical alias for legacy ipahdf. 0=no HDF5 output for this species."
         },
         "npbnd": {
           "type": "array",
           "items": {
             "type": "integer"
           },
-          "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd.",
+          "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd. Legacy spelling for particle_boundary_mode.",
           "minItems": 3,
           "maxItems": 3
         },
@@ -2341,8 +2721,99 @@
         "deltaemax": {
           "type": "number",
           "description": "Maximum energy change per species."
+        },
+        "particle_boundary_mode": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Particle boundary condition per axis (3-element array). Canonical alias for legacy npbnd.",
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "lower_x_boundary_injection_enabled": {
+          "type": "integer",
+          "description": "Injection flag at lower domain boundary. Canonical alias for legacy inpf. 0=no injection, 1=inject."
+        },
+        "upper_x_boundary_injection_enabled": {
+          "type": "integer",
+          "description": "Injection flag at upper domain boundary. Canonical alias for legacy inpb. 0=no injection, 1=inject."
+        },
+        "injection_interval": {
+          "type": "integer",
+          "description": "Injection interval [steps]. Canonical alias for legacy injct. 0=no periodic injection."
+        },
+        "injection_sample_count": {
+          "type": "integer",
+          "description": "Number of standard-distribution samples for injection particle generation. Canonical alias for legacy npr."
         }
-      }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "ipadig",
+              "particle_output_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipahdf",
+              "particle_hdf5_stride"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipaxyz",
+              "particle_output_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npbnd",
+              "particle_boundary_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "inpf",
+              "lower_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "inpb",
+              "upper_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "injct",
+              "injection_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npr",
+              "injection_sample_count"
+            ]
+          }
+        }
+      ]
     },
     "species_entry": {
       "$ref": "#/$defs/species_entry_base",
@@ -2371,6 +2842,70 @@
           "then": {
             "required": [
               "curf"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipadig",
+              "particle_output_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipahdf",
+              "particle_hdf5_stride"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "ipaxyz",
+              "particle_output_flags"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npbnd",
+              "particle_boundary_mode"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "inpf",
+              "lower_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "inpb",
+              "upper_x_boundary_injection_enabled"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "injct",
+              "injection_interval"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "npr",
+              "injection_sample_count"
             ]
           }
         }

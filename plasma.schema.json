@@ -111,7 +111,7 @@
     },
     "species": {
       "type": "array",
-      "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `species_groups` entry for parameter defaults. |\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
+      "description": "Per-species parameter definitions (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `species_groups` entry for parameter defaults. |\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Forward macro-particle division count for emission |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
       "items": {
         "$ref": "#/$defs/species_entry"
       }
@@ -1240,7 +1240,7 @@
           "items": {
             "type": "integer"
           },
-          "description": "Initial macro-particle count per species at startup. Mutually exclusive with dnsf."
+          "description": "Initial macro-particle count per species at startup. Mutually exclusive with [emissn].dnsf."
         },
         "qm": {
           "type": "array",
@@ -1388,13 +1388,6 @@
             "type": "number"
           },
           "description": "Loss-cone beta parameter per species."
-        },
-        "dnsf": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          },
-          "description": "Particle density scaling factor. Sets how many physical particles are grouped into one macro-particle. Mutually exclusive with npin."
         }
       }
     },
@@ -2639,7 +2632,7 @@
         },
         "dnsf": {
           "type": "number",
-          "description": "Density scaling factor (real). Higher values group more physical particles into one macro-particle. Mutually exclusive with npin."
+          "description": "Forward macro-particle division count for emission. Larger values create more particles with smaller weight."
         },
         "nflag_emit": {
           "type": "integer",
@@ -2819,7 +2812,7 @@
       "$ref": "#/$defs/species_entry_base",
       "allOf": [
         {
-          "description": "Per-species parameters (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Density scaling factor (real). Higher values group more physical particles in... |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
+          "description": "Per-species parameters (format_version = 2). Each `[[species]]` entry defines one particle species.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `curf` | number | Forward emission current density [simulation units]. |\n| `deltaemax` | number | Maximum energy change per species. |\n| `dnsb` | number | Backward macro-particle division count. |\n| `dnsf` | number | Forward macro-particle division count for emission |\n| `emission_leave_anti_particle` | boolean | Leave anti-particle at emission site. |\n| `injct` | integer | Injection interval [steps]. 0=no periodic injection, >0=inject every injct st... |\n| `inpb` | integer | Injection flag at upper domain boundary. 0=no injection, 1=inject. |\n| `inpf` | integer | Injection flag at lower domain boundary. 0=no injection, 1=inject. |\n| `ipadig` | integer | Particle diagnostic output interval. 0=no particle output for this species. |\n| `ipahdf` | integer | HDF5 particle data skip factor. 0=no HDF5 output for this species. |\n| `ipaxyz` | array | Particle data storage flags (7-element array): [x, y, z, vx, vy, vz, trace_id... |\n| `irhsp` | integer | Charge density output flag per species. |\n| `isort` | integer | Particle sort interval. |\n| `mfpath` | number | Mean free path per species. |\n| `nflag_emit` | integer | Emission type. 0=none, 1=surface emission (curf/curb), 2=space-charge-limited... |\n| `np` | integer | Maximum particle buffer size. Must be >= npin (auto-expanded if injection is ... |\n| `npbnd` | array | Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic... |\n| `npin` | integer | Initial macro-particle count at t=0. Set <0 to start with zero particles (bea... |\n| `npr` | integer | Number of standard-distribution samples for injection particle generation per... |\n| `path` | number | Parallel thermal velocity. Distribution: f ~ exp(-(v-spa)^2 / (2*path^2)). |\n| `pemax` | number | Maximum photoemission energy per species. |\n| `peth` | number | Perpendicular thermal velocity / sqrt(2). Actual v_perp = sqrt(2) * peth. |\n| `qm` | number | Charge-to-mass ratio for this species (negative for electrons). |\n| `vdri` | number | Drift velocity magnitude [simulation units]. Direction set by vdthz and vdthxy. |\n| `vdthxy` | number | Drift velocity azimuthal angle [deg] in the x-y plane. |\n| `vdthz` | number | Drift velocity polar angle [deg] from z-axis. |\n| `wp` | number | Plasma frequency for this species [simulation units]. |",
           "if": {
             "properties": {
               "nflag_emit": {
@@ -2955,6 +2948,10 @@
         "boundary_conductor_id": {
           "type": "integer",
           "description": "Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group."
+        },
+        "conductor_object": {
+          "type": "string",
+          "description": "ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input."
         },
         "rectangle_shape": {
           "type": "array",
@@ -3153,7 +3150,17 @@
           },
           "description": "Species ID of emitted secondary electrons per species (default: 1)."
         }
-      }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "boundary_conductor_id",
+              "conductor_object"
+            ]
+          }
+        }
+      ]
     },
     "boundary_entry": {
       "$ref": "#/$defs/boundary_entry_base",
@@ -3412,6 +3419,10 @@
         "group_id": {
           "type": "string",
           "description": "Reference to an object_groups entry for parameter defaults."
+        },
+        "id": {
+          "type": "string",
+          "description": "Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object."
         },
         "conductor": {
           "type": "string",

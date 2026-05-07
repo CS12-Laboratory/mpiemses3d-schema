@@ -1816,9 +1816,13 @@
         "boundary_se_model_type": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
           },
-          "description": "SEE yield model type. 0=Whipple (1981) empirical model (energy and angle dependent)."
+          "description": "SEE yield model type. 0=Whipple (1981) empirical model (energy and angle dependent), 1=constant yield."
         },
         "boundary_se_const_yield": {
           "type": "array",
@@ -1857,7 +1861,7 @@
         },
         "boundaries": {
           "type": "array",
-          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `boundary_groups` entry for parameter defaults. |\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
+          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `group_id` | string | Reference to a `boundary_groups` entry for parameter defaults. |\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
           "items": {
             "$ref": "#/$defs/boundary_entry"
           }
@@ -2060,7 +2064,7 @@
         },
         "sources": {
           "type": "array",
-          "description": "Magnetic dipole sources (format_version = 2). Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |",
+          "description": "Magnetic dipole sources (format_version = 2). Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 0=x-axis, 1=y-axis, 2=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |",
           "items": {
             "$ref": "#/$defs/dipole_source_entry"
           }
@@ -2071,7 +2075,13 @@
         },
         "mode_dipole": {
           "type": "integer",
-          "description": "Dipole mode selector. 0=disabled (default), 1=gap-fed antenna mode."
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "description": "Dipole/gap-drive mode selector. 0=disabled (default), 1=legacy gap-feed setup, 2=current-source gap drive, 3=lumped-element (resc/capc) gap drive."
         },
         "ngap": {
           "type": "integer",
@@ -3132,9 +3142,13 @@
         "boundary_se_model_type": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
           },
-          "description": "SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield."
+          "description": "SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield."
         },
         "boundary_se_const_yield": {
           "type": "array",
@@ -3200,7 +3214,7 @@
               "rectangle_shape"
             ]
           },
-          "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Sternglass/Vaughan, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
+          "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor ... |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regol... |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-... |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per sp... |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductivity` | number | Surface conductivity of this boundary element. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_shape` | array | Rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units (one axis pair degene... |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
         },
         {
           "if": {
@@ -3756,11 +3770,11 @@
         "mddir": {
           "type": "integer",
           "enum": [
+            0,
             1,
-            2,
-            3
+            2
           ],
-          "description": "Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis."
+          "description": "Dipole moment direction. 0=x-axis, 1=y-axis, 2=z-axis."
         }
       }
     },
@@ -3781,7 +3795,7 @@
       },
       "allOf": [
         {
-          "description": "Magnetic dipole. Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 1=x-axis, 2=y-axis, 3=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |"
+          "description": "Magnetic dipole. Each `[[dipole.sources]]` entry defines one dipole.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `md` | number | Magnetic dipole moment magnitude. |\n| `mddir` | integer | Dipole moment direction. 0=x-axis, 1=y-axis, 2=z-axis. |\n| `mdx` | number | Dipole x-position in grid units. |\n| `mdy` | number | Dipole y-position in grid units. |\n| `mdz` | number | Dipole z-position in grid units. |"
         }
       ]
     },

@@ -2347,7 +2347,7 @@
         },
         "periodic_raycast": {
           "type": "boolean",
-          "description": "Enable periodic boundary-aware ray-casting for photoelectron emission (default: false)."
+          "description": "Enable periodic boundary-aware ray-casting for photoelectron emission (default: false). plane-with-circle[x/y/z] boundaries are treated as infinite planes and are not duplicated."
         },
         "max_periodic_shift": {
           "type": "integer",

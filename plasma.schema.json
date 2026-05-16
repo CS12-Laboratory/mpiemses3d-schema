@@ -609,6 +609,10 @@
           "type": "integer",
           "description": "Current diagnostic output interval. Canonical alias for legacy ijdiag. 0=no output."
         },
+        "hdf_output_size_limit_gb": {
+          "type": "number",
+          "description": "Estimated HDF5 diagnostic output size limit [GB]. Default 100.0. Input loading aborts when estimated field/current/particle HDF5 output exceeds this value. Set <=0 to disable the guard."
+        },
         "iediag": {
           "type": "integer",
           "description": "Energy diagnostic output interval. 0=no output."
@@ -2530,6 +2534,10 @@
         "OHHELP_repiter": {
           "type": "integer",
           "description": "If non-zero, report OHHELP solver iteration counts."
+        },
+        "hdf_io_trace": {
+          "type": "integer",
+          "description": "If non-zero, print HDF5 diagnostic open/write/flush/close breadcrumbs from rank 0 to stderr."
         }
       }
     },

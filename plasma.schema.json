@@ -1073,7 +1073,7 @@
         },
         "pftmode": {
           "type": "integer",
-          "description": "Poisson field solver mode. Legacy spelling for poisson_solver_mode. Auto mode 0 chooses mode 3/4 for compatible dedicated process grids and otherwise mode 1. Mode 2 is used only when explicitly requested. Explicit mode 3 requires nodes(2)*nodes(3)==1; explicit mode 4 requires nodes(1)*nodes(2)==1."
+          "description": "Poisson field solver mode. Legacy spelling for poisson_solver_mode. Auto mode 0 chooses mode 3/4 for compatible dedicated process grids, then mode 2 when ny > nz, and otherwise mode 1. Explicit mode 3 requires nodes(2)*nodes(3)==1; explicit mode 4 requires nodes(1)*nodes(2)==1."
         },
         "mfpath": {
           "type": "array",
@@ -1122,7 +1122,7 @@
         },
         "poisson_solver_mode": {
           "type": "integer",
-          "description": "Poisson field solver mode. Canonical alias for legacy pftmode. Auto mode 0 chooses mode 3/4 for compatible dedicated process grids and otherwise mode 1. Mode 2 is used only when explicitly requested. Explicit mode 3 requires nodes(2)*nodes(3)==1; explicit mode 4 requires nodes(1)*nodes(2)==1."
+          "description": "Poisson field solver mode. Canonical alias for legacy pftmode. Auto mode 0 chooses mode 3/4 for compatible dedicated process grids, then mode 2 when ny > nz, and otherwise mode 1. Explicit mode 3 requires nodes(2)*nodes(3)==1; explicit mode 4 requires nodes(1)*nodes(2)==1."
         },
         "potential_boundary_mode": {
           "type": "array",

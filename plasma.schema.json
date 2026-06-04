@@ -1877,7 +1877,7 @@
         },
         "conductor_groups": {
           "type": "object",
-          "description": "Conductor groups (format_version = 2). Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating, abs(mtd_vchg)=1=fixed; sign is preserved for legacy input compatibility. |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when abs(mtd_vchg) = 1; the potential sign is specified by pfixed. |",
+          "description": "Conductor groups (format_version = 2). Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating, abs(mtd_vchg)=1=fixed; sign is preserved for legacy input compatibility. |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when abs(mtd_vchg) = 1; the potential sign is specified by pfixed. |\n| `biasp` | number | Default bias potential for all `[[ptcond.objects]]` entries in this group; object-level `biasp` overrides it. |",
           "additionalProperties": {
             "$ref": "#/$defs/conductor_group_entry"
           }
@@ -3439,7 +3439,7 @@
       },
       "allOf": [
         {
-          "description": "Conductor group. Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating, abs(mtd_vchg)=1=fixed; sign is preserved for legacy input compatibility. |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when abs(mtd_vchg) = 1; the potential sign is specified by pfixed. |"
+          "description": "Conductor group. Each `[ptcond.conductor_groups.<name>]` defines shared electrical properties.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `mtd_vchg` | integer | Potential treatment method. 0=floating, abs(mtd_vchg)=1=fixed; sign is preserved for legacy input compatibility. |\n| `pfixed` | number | Fixed potential value [simulation units]. Only used when abs(mtd_vchg) = 1; the potential sign is specified by pfixed. |\n| `biasp` | number | Default bias potential for all `[[ptcond.objects]]` entries in this group; object-level `biasp` overrides it. |"
         }
       ]
     },

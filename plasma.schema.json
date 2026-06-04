@@ -329,6 +329,20 @@
               "items": {
                 "$ref": "#/$defs/meta_physical_conductor"
               }
+            },
+            "object_groups": {
+              "type": "object",
+              "description": "Named groups of default conductor-object parameters. Each `[[meta.physical.objects]]` entry can reference a group via `group_id`.",
+              "additionalProperties": {
+                "$ref": "#/$defs/meta_physical_object_base"
+              }
+            },
+            "objects": {
+              "type": "array",
+              "description": "Per-conductor-object physical parameters.",
+              "items": {
+                "$ref": "#/$defs/meta_physical_object"
+              }
             }
           }
         }
@@ -441,6 +455,41 @@
       "then": {
         "required": [
           "group"
+        ]
+      }
+    },
+    "meta_physical_object_base": {
+      "type": "object",
+      "description": "Physical parameters for one conductor object in SI units.",
+      "additionalProperties": true,
+      "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to an object_groups entry for parameter defaults."
+        },
+        "id": {
+          "type": "string",
+          "description": "Conductor object ID (id in [[ptcond.objects]])."
+        },
+        "bias_potential_V": {
+          "type": "number",
+          "description": "Object-level bias potential [V]. -> ptcond.objects[id].biasp"
+        }
+      }
+    },
+    "meta_physical_object": {
+      "$ref": "#/$defs/meta_physical_object_base",
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "id",
+          "bias_potential_V"
         ]
       }
     },

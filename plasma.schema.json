@@ -669,6 +669,8 @@
         },
         "nmd": {
           "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
           "description": "Number of magnetic dipoles (maximum 10). Auto-computed from [[dipole.sources]] count in format_version=2."
         },
         "mode_dipole": {
@@ -831,7 +833,9 @@
         "nepl": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16
           },
           "description": "Number of explicit emission planes per species."
         },
@@ -908,21 +912,34 @@
         "ipcpl": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1
           },
-          "description": "Conductor ID coupled to emission plane for charge conservation."
+          "description": "Conductor ID coupled to emission plane for charge conservation. Each value must be in 1..npc."
         },
         "nemd": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              -3,
+              -2,
+              -1,
+              1,
+              2,
+              3
+            ]
           },
           "description": "Emission normal direction per emission plane. +/-1=x, +/-2=y, +/-3=z (sign = forward/backward)."
         },
         "omniemit": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
           },
           "description": "Omni-directional emission flag per emission plane. 0=directional, 1=omni-directional (half-Maxwellian)."
         },
@@ -1659,7 +1676,7 @@
         },
         "random_seed": {
           "type": "integer",
-          "description": "Random number generator seed. 0=use default, >0=deterministic seed for reproducibility."
+          "description": "Random number generator seed. Omit or use -9999 to choose the simulator default; any other integer is passed to the RNG setup for deterministic initialization."
         }
       }
     },
@@ -1699,6 +1716,8 @@
         },
         "njs": {
           "type": "integer",
+          "minimum": 0,
+          "maximum": 4,
           "description": "Number of current sources (default: 0, max 4). Auto-computed from [[jsrc.sources]] count in format_version=2."
         }
       }
@@ -1806,7 +1825,7 @@
         "physical": {
           "type": "object",
           "description": "Physical (SI-unit) plasma conditions. Used by `emu apply` to compute simulation-unit parameters. Not consumed by the solver.",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "properties": {
             "density_m3": {
               "type": "number",
@@ -1889,7 +1908,7 @@
     "meta_physical_species_base": {
       "type": "object",
       "description": "Physical parameters for one particle species in SI units. Index corresponds to [[species]] index.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -1965,7 +1984,7 @@
     "meta_physical_conductor_base": {
       "type": "object",
       "description": "Physical parameters for one conductor group in SI units.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -2007,7 +2026,7 @@
     "meta_physical_object_base": {
       "type": "object",
       "description": "Physical parameters for one conductor object in SI units.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -2202,6 +2221,7 @@
               "plane-with-circlex",
               "plane-with-circley",
               "plane-with-circlez",
+              "none",
               "flat-surface",
               "rectangle-hole",
               "dent-rectangle-hole",
@@ -2481,21 +2501,24 @@
         "boundary_se_const_yield": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Constant SEE yield (used when const-yield model is selected)."
         },
         "boundary_se_yield_max": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Maximum SEE yield delta_max at optimal energy."
         },
         "boundary_se_energy_max": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Incident energy E_max [EMSES eV] at which yield = delta_max."
         },
@@ -2506,16 +2529,134 @@
           },
           "description": "Species ID for emitted secondary electrons (default: 1 = electron)."
         },
+        "boundary_mirror_reflection_rate": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          "description": "Specular (mirror) reflection probability per boundary and species (0.0-1.0)."
+        },
+        "boundary_reversal_reflection_rate": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          "description": "Reversal (backscatter) reflection probability per boundary and species (0.0-1.0)."
+        },
+        "boundary_mirror_reflect_alpha": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          },
+          "description": "Beckmann roughness parameter alpha for specular reflection per boundary and species."
+        },
+        "boundary_reversal_reflect_alpha": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          },
+          "description": "Beckmann roughness parameter alpha for reversal reflection per boundary and species."
+        },
+        "boundary_mirror_reflect_energy_loss_frac": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          "description": "Kinetic energy loss fraction on specular reflection per boundary and species (0.0-1.0)."
+        },
+        "boundary_reversal_reflect_energy_loss_frac": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          "description": "Kinetic energy loss fraction on reversal reflection per boundary and species (0.0-1.0)."
+        },
         "boundary_groups": {
           "type": "object",
-          "description": "Named groups of default boundary parameters. Each `[[ptcond.boundaries]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
+          "description": "Named groups of default boundary parameters. Each `[[ptcond.boundaries]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `rcurv` | number | Curvature ratio for dent/hyperboloid/ellipsoid hole surfaces. Surface entry shorthand for the global legacy &ptcond parameter; all structured entries must agree. |\n| `xlrechole` | array | X lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `xurechole` | array | X upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `ylrechole` | array | Y lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `yurechole` | array | Y upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zlrechole` | array | Z lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zssurf` | number | Z-coordinate of the ground or hole surface [grid units]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zurechole` | array | Z upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
           "additionalProperties": {
             "$ref": "#/$defs/boundary_entry_base"
           }
         },
         "boundaries": {
           "type": "array",
-          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
+          "description": "Complex boundary elements (format_version = 2). Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `rcurv` | number | Curvature ratio for dent/hyperboloid/ellipsoid hole surfaces. Surface entry shorthand for the global legacy &ptcond parameter; all structured entries must agree. |\n| `xlrechole` | array | X lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `xurechole` | array | X upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `ylrechole` | array | Y lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `yurechole` | array | Y upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zlrechole` | array | Z lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zssurf` | number | Z-coordinate of the ground or hole surface [grid units]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zurechole` | array | Z upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |",
           "maxItems": 30,
           "items": {
             "$ref": "#/$defs/boundary_entry"
@@ -2531,14 +2672,14 @@
         },
         "object_groups": {
           "type": "object",
-          "description": "Named groups of default object parameters. Each `[[ptcond.objects]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center padded to 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |",
+          "description": "Named groups of default object parameters. Each `[[ptcond.objects]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center with 2 or 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |",
           "additionalProperties": {
             "$ref": "#/$defs/object_entry_base"
           }
         },
         "objects": {
           "type": "array",
-          "description": "Conductor objects (format_version = 2). Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center padded to 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |",
+          "description": "Conductor objects (format_version = 2). Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center with 2 or 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |",
           "maxItems": 30,
           "items": {
             "$ref": "#/$defs/object_entry"
@@ -2546,7 +2687,12 @@
         },
         "sfecrrct": {
           "type": "number",
-          "description": "Surface E-field correction factor (default: 0.0). When non-zero, applies a correction to the electric field at conductor surfaces."
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "description": "Surface E-field correction mode (default: 0). 0=disabled, 1=correct conductor-surface E-field relocation for particle interpolation, 2=mode 1 plus conductor/boom potential smoothing and surface-gradient correction while reconstructing E from potential."
         },
         "plane_with_circle_hole_zlower": {
           "type": "array",
@@ -2679,8 +2825,40 @@
             ]
           },
           "then": {
-            "required": [
-              "zssurf"
+            "anyOf": [
+              {
+                "required": [
+                  "zssurf"
+                ]
+              },
+              {
+                "properties": {
+                  "boundaries": {
+                    "items": {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "flat-surface"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ],
+                        "not": {
+                          "required": [
+                            "group_id"
+                          ]
+                        }
+                      },
+                      "then": {
+                        "required": [
+                          "zssurf"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
             ]
           }
         },
@@ -2712,14 +2890,58 @@
             ]
           },
           "then": {
-            "required": [
-              "zssurf",
-              "xlrechole",
-              "xurechole",
-              "ylrechole",
-              "yurechole",
-              "zlrechole",
-              "zurechole"
+            "anyOf": [
+              {
+                "required": [
+                  "zssurf",
+                  "xlrechole",
+                  "xurechole",
+                  "ylrechole",
+                  "yurechole",
+                  "zlrechole",
+                  "zurechole"
+                ]
+              },
+              {
+                "properties": {
+                  "boundaries": {
+                    "items": {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "enum": [
+                              "rectangle-hole",
+                              "dent-rectangle-hole",
+                              "cylinder-hole",
+                              "hyperboloid-hole",
+                              "ellipsoid-hole"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ],
+                        "not": {
+                          "required": [
+                            "group_id"
+                          ]
+                        }
+                      },
+                      "then": {
+                        "required": [
+                          "zssurf",
+                          "xlrechole",
+                          "xurechole",
+                          "ylrechole",
+                          "yurechole",
+                          "zlrechole",
+                          "zurechole"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
             ]
           }
         },
@@ -2749,8 +2971,44 @@
             ]
           },
           "then": {
-            "required": [
-              "rcurv"
+            "anyOf": [
+              {
+                "required": [
+                  "rcurv"
+                ]
+              },
+              {
+                "properties": {
+                  "boundaries": {
+                    "items": {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "enum": [
+                              "dent-rectangle-hole",
+                              "hyperboloid-hole",
+                              "ellipsoid-hole"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ],
+                        "not": {
+                          "required": [
+                            "group_id"
+                          ]
+                        }
+                      },
+                      "then": {
+                        "required": [
+                          "rcurv"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
             ]
           }
         },
@@ -3039,7 +3297,7 @@
     "boundary_entry_base": {
       "type": "object",
       "description": "A single boundary element for complex mode.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -3068,6 +3326,7 @@
             "plane-with-circlex",
             "plane-with-circley",
             "plane-with-circlez",
+            "none",
             "flat-surface",
             "rectangle-hole",
             "dent-rectangle-hole",
@@ -3204,28 +3463,34 @@
         "boundary_se_yield_max": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Maximum secondary electron emission (SEE) yield delta_max per species."
         },
         "boundary_se_energy_max": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species."
         },
         "boundary_mirror_reflection_rate": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           },
           "description": "Specular (mirror) reflection probability per species (0.0–1.0)."
         },
         "boundary_reversal_reflection_rate": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           },
           "description": "Reversal (backscatter) reflection probability per species (0.0–1.0)."
         },
@@ -3246,14 +3511,18 @@
         "boundary_mirror_reflect_energy_loss_frac": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           },
           "description": "Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v)."
         },
         "boundary_reversal_reflect_energy_loss_frac": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           },
           "description": "Kinetic energy loss fraction on reversal reflection per species."
         },
@@ -3271,7 +3540,8 @@
         "boundary_se_const_yield": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "description": "Constant SEE yield value per species (used when model_type=1)."
         },
@@ -3293,6 +3563,68 @@
         "plane_with_circle_hole_radius": {
           "type": "number",
           "description": "Circular hole radius for the lower and upper planes [grid units]."
+        },
+        "zssurf": {
+          "type": "number",
+          "description": "Z-coordinate of the ground surface [grid units] (for *-surface and *-hole types). May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter."
+        },
+        "xlrechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "X lower boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "xurechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "X upper boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "ylrechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Y lower boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "yurechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Y upper boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "zlrechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Z lower boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "zurechole": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Z upper boundary of rectangular hole [grid units]. May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter. A one-value array is expanded to [value, value].",
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "rcurv": {
+          "type": "number",
+          "description": "Curvature ratio: minimum-to-maximum radius (for hyperboloid-hole, ellipsoid-hole, dent-rectangle-hole). May be written in a surface [[ptcond.boundaries]] entry; it still maps to the global legacy &ptcond parameter."
         }
       },
       "allOf": [
@@ -3384,7 +3716,7 @@
               "rectangle_shape"
             ]
           },
-          "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
+          "description": "Complex boundary element. Each `[[ptcond.boundaries]]` entry defines one boundary shape.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `boundary_conductor_id` | integer | Conductor ID (ipc) for charge accounting. Links this boundary to a conductor group. |\n| `boundary_mirror_reflect_alpha` | array | Beckmann roughness parameter alpha for specular reflection per species (regolith ~0.3–0.5). |\n| `boundary_mirror_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on specular reflection per species (v' = sqrt(1-frac)*v). |\n| `boundary_mirror_reflection_rate` | array | Specular (mirror) reflection probability per species (0.0–1.0). |\n| `boundary_reversal_reflect_alpha` | array | Beckmann roughness parameter alpha for reversal reflection per species. |\n| `boundary_reversal_reflect_energy_loss_frac` | array | Kinetic energy loss fraction on reversal reflection per species. |\n| `boundary_reversal_reflection_rate` | array | Reversal (backscatter) reflection probability per species (0.0–1.0). |\n| `boundary_se_const_yield` | array | Constant SEE yield value per species (used when model_type=1). |\n| `boundary_se_energy_max` | array | Incident energy E_max [EMSES eV] at which SEE yield reaches delta_max, per species. |\n| `boundary_se_model_type` | array | SEE yield model type per species. 0=Whipple/Vaughan-like, 1=constant yield. |\n| `boundary_se_species_id` | array | Species ID of emitted secondary electrons per species (default: 1). |\n| `boundary_se_yield_max` | array | Maximum secondary electron emission (SEE) yield delta_max per species. |\n| `circle_origin` | array | Circle center coordinates [x, y, z] in grid units. |\n| `circle_radius` | number | Circle radius in grid units. |\n| `conductor_object` | string | ID of a [[ptcond.objects]] entry used for charge accounting. Resolved to boundary_conductor_id while reading the input. |\n| `cuboid_shape` | array | Cuboid bounds [xl, xu, yl, yu, zl, zu] in grid units. |\n| `cylinder_height` | number | Cylinder height in grid units along the alignment axis. |\n| `cylinder_origin` | array | Cylinder bottom-center coordinates [x, y, z] in grid units. |\n| `cylinder_radius` | number | Cylinder radius in grid units. |\n| `disk_height` | number | Disk thickness in grid units along the alignment axis. |\n| `disk_inner_radius` | number | Disk inner radius for annular disk in grid units (0 for solid disk). |\n| `disk_origin` | array | Disk bottom-center coordinates [x, y, z] in grid units. |\n| `disk_radius` | number | Disk outer radius in grid units. |\n| `enable_secondary_electron_emission` | array | Enable secondary electron emission (SEE) for this boundary per species. |\n| `group_id` | string | Reference to a boundary_groups entry for parameter defaults. |\n| `rcurv` | number | Curvature ratio for dent/hyperboloid/ellipsoid hole surfaces. Surface entry shorthand for the global legacy &ptcond parameter; all structured entries must agree. |\n| `xlrechole` | array | X lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `xurechole` | array | X upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `ylrechole` | array | Y lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `yurechole` | array | Y upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zlrechole` | array | Z lower bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zssurf` | number | Z-coordinate of the ground or hole surface [grid units]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `zurechole` | array | Z upper bounds of the rectangular hole [grid units], 1 or 2 values. A one-value array is expanded to [value, value]. Surface entry shorthand for the global legacy &ptcond parameter. |\n| `plane_with_circle_hole_height` | number | Vertical distance between the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_radius` | number | Circular hole radius for the lower and upper planes [grid units]. |\n| `plane_with_circle_hole_zlower` | number | Lower z-position of the plane-with-circle-hole stack [grid units]. |\n| `plane_with_circle_origin` | array | Center coordinates [x, y, z] of circular hole in plane, in grid units. |\n| `plane_with_circle_radius` | number | Radius of the circular hole in the plane, in grid units. |\n| `rectangle_corners` | array | Four corner points [[x1, y1, z1], ..., [x4, y4, z4]] in grid units. |\n| `rectangle_shape` | array | Axis-aligned rectangle bounds [xl, xu, yl, yu, zl, zu] in grid units. One axis pair should be degenerate. |\n| `sphere_origin` | array | Sphere center coordinates [x, y, z] in grid units. |\n| `sphere_radius` | number | Sphere radius in grid units. |\n| `type` | string | Boundary shape type (object or surface). |"
         },
         {
           "if": {
@@ -3578,7 +3910,7 @@
     "conductor_group_entry": {
       "type": "object",
       "description": "A conductor group defining shared electrical properties.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "mtd_vchg": {
           "type": "integer",
@@ -3607,7 +3939,7 @@
     "object_entry_base": {
       "type": "object",
       "description": "A solid conductor object with geometry and group assignment.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -3673,9 +4005,9 @@
           "items": {
             "type": "number"
           },
-          "minItems": 3,
+          "minItems": 2,
           "maxItems": 3,
-          "description": "Center coordinates for sphere [x, y, z] or cylinder cross-section center padded to 3 components."
+          "description": "Center coordinates for sphere [x, y, z], or cylinder cross-section center with 2 or 3 components."
         },
         "bdyedge": {
           "type": "array",
@@ -3778,7 +4110,7 @@
               "zupc"
             ]
           },
-          "description": "Conductor object. Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center padded to 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |"
+          "description": "Conductor object. Each `[[ptcond.objects]]` entry defines one solid body.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `bdyalign` | integer | Cylinder axis alignment direction. 1=x, 2=y, 3=z. |\n| `bdycoord` | array | Center coordinates for sphere [x, y, z] or cylinder cross-section center with 2 or 3 components. |\n| `bdyedge` | array | Cylinder axis endpoints [lower, upper] along the alignment axis. |\n| `bdyradius` | number | Radius for cylinder (geotype=2) or sphere (geotype=3) in grid units. |\n| `biasp` | number | Bias potential offset applied to this conductor [simulation units] (default: 0.0). |\n| `conductor` | string | Name of the conductor group this object belongs to (must match a key in [ptcond.conductor_groups]). |\n| `dscaled` | number | Capacitance scaling factor for this conductor (default: 1.0). Multiplied with biasp in surface charge calculations. |\n| `geotype` | integer | Shape type. 0=cuboid (filled), 1=cuboid (shell/boundary only), 2=cylinder, 3=sphere. |\n| `group_id` | string | Reference to an object_groups entry for parameter defaults. |\n| `id` | string | Optional object identifier. [[ptcond.boundaries]] can reference it via conductor_object. |\n| `nflag_subcell` | integer | Sub-cell boundary resolution flag. 0=standard grid-aligned, 1=sub-cell boundary for more accurate conductor representation. |\n| `wirealign` | integer | Wire/boom axis direction. 0=disabled (no wire), 1=x, 2=y, 3=z. Attaches a thin wire to this conductor. |\n| `wireeradius` | number | Wire effective (electrical) radius for capacitance calculation. |\n| `wirehlength` | number | Wire half-length along the alignment axis in grid units. |\n| `wireorigin` | array | Wire origin coordinates [x, y, z] in grid units. |\n| `wirerradius` | number | Wire physical radius for particle collision detection in grid units. |\n| `xlpc` | number | Cuboid x-lower bound in grid units (geotype=0 or 1). |\n| `xupc` | number | Cuboid x-upper bound in grid units (geotype=0 or 1). |\n| `ylpc` | number | Cuboid y-lower bound in grid units (geotype=0 or 1). |\n| `yupc` | number | Cuboid y-upper bound in grid units (geotype=0 or 1). |\n| `zlpc` | number | Cuboid z-lower bound in grid units (geotype=0 or 1). |\n| `zupc` | number | Cuboid z-upper bound in grid units (geotype=0 or 1). |"
         },
         {
           "if": {
@@ -3903,7 +4235,29 @@
     "scrnt_group": {
       "type": "object",
       "description": "Screen current diagnostics.",
-      "additionalProperties": true
+      "additionalProperties": true,
+      "properties": {
+        "imode": {
+          "type": "integer",
+          "description": "Screen/current-drive mode selector."
+        },
+        "omegatw": {
+          "type": "number",
+          "description": "Test-wave angular frequency."
+        },
+        "lambdatw": {
+          "type": "number",
+          "description": "Test-wave wavelength."
+        },
+        "amptw": {
+          "type": "number",
+          "description": "Test-wave amplitude."
+        },
+        "thetatw": {
+          "type": "number",
+          "description": "Test-wave angle."
+        }
+      }
     },
     "system_group": {
       "type": "object",
@@ -3929,6 +4283,42 @@
         "ionchg": {
           "type": "integer",
           "description": "Background ion charge option. 0=uniform neutralization across system, 1=local neutralization at each grid point. Legacy spelling for background_ion_charge_mode."
+        },
+        "jxfltr": {
+          "type": "integer",
+          "description": "Current-filter option for Jx. -1=no filtering; bit flags 1/2/4 select filtering along x/y/z."
+        },
+        "jyfltr": {
+          "type": "integer",
+          "description": "Current-filter option for Jy. -1=no filtering; bit flags 1/2/4 select filtering along x/y/z."
+        },
+        "jzfltr": {
+          "type": "integer",
+          "description": "Current-filter option for Jz. -1=no filtering; bit flags 1/2/4 select filtering along x/y/z."
+        },
+        "ipexfl": {
+          "type": "integer",
+          "description": "Particle-pushing field filter option for pex. Uses the same bit flags as jxfltr."
+        },
+        "ipeyfl": {
+          "type": "integer",
+          "description": "Particle-pushing field filter option for pey. Uses the same bit flags as jyfltr."
+        },
+        "ipezfl": {
+          "type": "integer",
+          "description": "Particle-pushing field filter option for pez. Uses the same bit flags as jzfltr."
+        },
+        "nfltrx": {
+          "type": "integer",
+          "description": "Electrostatic Ex Fourier filter cutoff. If >0, modes above this wave number are filtered."
+        },
+        "nfltry": {
+          "type": "integer",
+          "description": "Electrostatic Ey Fourier filter cutoff. If >0, modes above this wave number are filtered."
+        },
+        "nfltrz": {
+          "type": "integer",
+          "description": "Electrostatic Ez Fourier filter cutoff. If >0, modes above this wave number are filtered."
         },
         "nfbnd": {
           "type": "array",
@@ -3977,7 +4367,7 @@
         },
         "separate_accumulated_and_space_charge": {
           "type": "boolean",
-          "description": "Separate accumulated surface charge from space charge in the Poisson solver (default: false)."
+          "description": "Separate accumulated surface charge from space charge in the Poisson solver (default: true)."
         },
         "nxl": {
           "type": "integer",
@@ -4005,7 +4395,7 @@
         },
         "nflag_ecrct": {
           "type": "integer",
-          "description": "Electrostatic field correction flag. 0=neglect, 1=apply correction. Default: 0. Legacy spelling for electrostatic_correction_mode."
+          "description": "Electrostatic field correction flag. 0=neglect, 1=apply correction. Default: 1. Legacy spelling for electrostatic_correction_mode."
         },
         "pftmode": {
           "type": "integer",
@@ -4017,6 +4407,54 @@
             "type": "number"
           },
           "description": "Mean free path per species for collision modeling."
+        },
+        "xlcol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Lower x bounds of the collision region."
+        },
+        "xucol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Upper x bounds of the collision region."
+        },
+        "ylcol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Lower y bounds of the collision region."
+        },
+        "yucol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Upper y bounds of the collision region."
+        },
+        "zlcol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Lower z bounds of the collision region."
+        },
+        "zucol": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "description": "Upper z bounds of the collision region."
         },
         "field_substeps_per_particle_step": {
           "type": "integer",
@@ -4058,7 +4496,7 @@
         },
         "electrostatic_correction_mode": {
           "type": "integer",
-          "description": "Electrostatic field correction mode. Canonical alias for legacy nflag_ecrct. 0=neglect, 1=apply correction."
+          "description": "Electrostatic field correction mode. Canonical alias for legacy nflag_ecrct. 0=neglect, 1=apply correction. Default: 1."
         },
         "poisson_solver_mode": {
           "type": "integer",
@@ -4173,7 +4611,7 @@
     },
     "testch_group": {
       "type": "object",
-      "description": "Static or distributed test charges.",
+      "description": "Static point test charges and distributed charge-cluster sources.",
       "additionalProperties": {
         "not": {
           "anyOf": [
@@ -4192,26 +4630,45 @@
       "properties": {
         "charge_groups": {
           "type": "object",
-          "description": "Named groups of default test-charge parameters. Each `[[testch.charges]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
+          "description": "Named groups of default point test-charge parameters. Each `[[testch.charges]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
           "additionalProperties": {
             "$ref": "#/$defs/testch_charge_entry_base"
           }
         },
         "charges": {
           "type": "array",
-          "description": "Test charges (format_version = 2). Each `[[testch.charges]]` entry defines one test charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
+          "description": "Point test charges (format_version = 2). Each `[[testch.charges]]` entry defines one point test charge and contributes to `ntch`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |",
           "maxItems": 4,
           "items": {
             "$ref": "#/$defs/testch_charge_entry"
           }
         },
+        "charge_cluster_groups": {
+          "type": "object",
+          "description": "Named groups of default distributed charge-cluster parameters. Each `[[testch.charge_clusters]]` entry can reference a group via `group_id`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `group_id` | string | Reference to a charge_cluster_groups entry for parameter defaults. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |",
+          "additionalProperties": {
+            "$ref": "#/$defs/testch_charge_cluster_entry_base"
+          }
+        },
+        "charge_clusters": {
+          "type": "array",
+          "description": "Distributed charge-cluster sources (format_version = 2). Each `[[testch.charge_clusters]]` entry defines one cluster and contributes to `nqclst`.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `group_id` | string | Reference to a charge_cluster_groups entry for parameter defaults. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |",
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/testch_charge_cluster_entry"
+          }
+        },
         "ntch": {
           "type": "integer",
-          "description": "Number of test charges (default: 0, max 4). Auto-computed from [[testch.charges]] count in format_version=2."
+          "minimum": 0,
+          "maximum": 4,
+          "description": "Number of point test charges (default: 0, max 4). Auto-computed from [[testch.charges]] count in format_version=2."
         },
         "nqclst": {
           "type": "integer",
-          "description": "Number of charge cluster sources (default: 0)."
+          "minimum": 0,
+          "maximum": 4,
+          "description": "Number of charge-cluster sources (default: 0, max 4). Auto-computed from [[testch.charge_clusters]] count in format_version=2."
         },
         "dimclst": {
           "type": "array",
@@ -4223,6 +4680,7 @@
             "minItems": 3,
             "maxItems": 3
           },
+          "maxItems": 4,
           "description": "Charge-cluster dimensions per source: [[nx, ny, nz], ...]."
         },
         "rclst": {
@@ -4235,6 +4693,7 @@
             "minItems": 5,
             "maxItems": 5
           },
+          "maxItems": 4,
           "description": "Charge-cluster geometry per source: [[x, y, z, spacing, extent], ...]."
         },
         "rhopeak": {
@@ -4242,14 +4701,15 @@
           "items": {
             "type": "number"
           },
+          "maxItems": 4,
           "description": "Peak charge density per charge-cluster source."
         }
       }
     },
     "testch_charge_entry_base": {
       "type": "object",
-      "description": "A test charge definition.",
-      "additionalProperties": true,
+      "description": "A point test charge definition.",
+      "additionalProperties": false,
       "properties": {
         "group_id": {
           "type": "string",
@@ -4279,6 +4739,27 @@
         "rcutoff": {
           "type": "number",
           "description": "Cutoff radius for the test charge potential [grid units]. Default: machine epsilon."
+        }
+      }
+    },
+    "testch_charge_entry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/testch_charge_entry_base"
+        },
+        {
+          "description": "Point test charge. Each `[[testch.charges]]` entry defines one point charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |"
+        }
+      ]
+    },
+    "testch_charge_cluster_entry_base": {
+      "type": "object",
+      "description": "A distributed charge-cluster source definition.",
+      "additionalProperties": false,
+      "properties": {
+        "group_id": {
+          "type": "string",
+          "description": "Reference to a charge_cluster_groups entry for parameter defaults."
         },
         "dimclst": {
           "type": "array",
@@ -4304,13 +4785,27 @@
         }
       }
     },
-    "testch_charge_entry": {
+    "testch_charge_cluster_entry": {
+      "if": {
+        "not": {
+          "required": [
+            "group_id"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "dimclst",
+          "rclst",
+          "rhopeak"
+        ]
+      },
       "allOf": [
         {
-          "$ref": "#/$defs/testch_charge_entry_base"
+          "$ref": "#/$defs/testch_charge_cluster_entry_base"
         },
         {
-          "description": "Test charge. Each `[[testch.charges]]` entry defines one charge.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `e1tch` | number | Electric field amplitude parameter for the test charge. |\n| `group_id` | string | Reference to a charge_groups entry for parameter defaults. |\n| `p1tch` | number | Potential amplitude parameter for the test charge. |\n| `qtch` | number | Test charge value [simulation charge units]. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rcutoff` | number | Cutoff radius for the test charge potential [grid units]. Default: machine epsilon. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |\n| `rtch` | array | Test charge position [x, y, z] in grid units. |"
+          "description": "Distributed charge-cluster source. Each `[[testch.charge_clusters]]` entry defines one cluster.\n\n| Parameter | Type | Description |\n|---|---|---|\n| `dimclst` | array | Charge-cluster dimensions [nx, ny, nz] in grid cells. |\n| `group_id` | string | Reference to a charge_cluster_groups entry for parameter defaults. |\n| `rclst` | array | Charge-cluster geometry [x, y, z, spacing, extent]. |\n| `rhopeak` | number | Peak charge density for this charge-cluster source. |"
         }
       ]
     },
@@ -4375,7 +4870,61 @@
     "wave_group": {
       "type": "object",
       "description": "Wave excitation parameters.",
-      "additionalProperties": true
+      "additionalProperties": true,
+      "properties": {
+        "nwave": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4,
+          "description": "Number of incident/external wave definitions (default: 0, max 4)."
+        },
+        "twave": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "description": "Wave type selector per wave definition."
+        },
+        "ebamp": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "description": "Electric/magnetic wave amplitude components stored as [component][wave]."
+        },
+        "ldwv": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "description": "Wave length/scale parameter per wave definition."
+        },
+        "orgwv": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "description": "Wave origin coordinates stored as [x/y/z][wave]."
+        },
+        "angwv": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "description": "Wave direction angles stored as [angle][wave]."
+        }
+      }
     },
     "species_entry_base": {
       "type": "object",
@@ -4424,10 +4973,18 @@
         },
         "inpf": {
           "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
           "description": "Injection flag at lower domain boundary. 0=no injection, 1=inject. Legacy spelling for lower_x_boundary_injection_enabled."
         },
         "inpb": {
           "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
           "description": "Injection flag at upper domain boundary. 0=no injection, 1=inject. Legacy spelling for upper_x_boundary_injection_enabled."
         },
         "injct": {
@@ -4493,7 +5050,13 @@
         "npbnd": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              -1,
+              0,
+              1,
+              2
+            ]
           },
           "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd. Legacy spelling for particle_boundary_mode.",
           "minItems": 3,
@@ -4530,7 +5093,13 @@
         "particle_boundary_mode": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "integer",
+            "enum": [
+              -1,
+              0,
+              1,
+              2
+            ]
           },
           "description": "Particle boundary condition per axis (3-element array). Canonical alias for legacy npbnd.",
           "minItems": 3,
@@ -4538,10 +5107,18 @@
         },
         "lower_x_boundary_injection_enabled": {
           "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
           "description": "Injection flag at lower domain boundary. Canonical alias for legacy inpf. 0=no injection, 1=inject."
         },
         "upper_x_boundary_injection_enabled": {
           "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
           "description": "Injection flag at upper domain boundary. Canonical alias for legacy inpb. 0=no injection, 1=inject."
         },
         "injection_interval": {
@@ -4662,6 +5239,10 @@
         },
         "emission_time_mode": {
           "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
           "description": "Emission time variation mode per species. 0=constant, 1=Gaussian temporal profile."
         },
         "emission_start_step": {

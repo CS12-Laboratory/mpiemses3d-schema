@@ -1313,9 +1313,10 @@
           "enum": [
             0,
             1,
-            2
+            2,
+            3
           ],
-          "description": "Field solver mode. 0 = Electrostatic (Poisson) — no magnetic field evolution, CFL violations are warnings only. 1 = Full electromagnetic (Maxwell) — CFL condition strictly enforced. 2 = legacy implicit EM (`imses`) path. CoToCoA requester/worker builds replace the emflag=0 electrostatic path and are not selected by emflag=2."
+          "description": "Field solver mode. 0 = Electrostatic (Poisson) — no magnetic field evolution, CFL violations are warnings only. 1 = Full electromagnetic (Maxwell) — CFL condition strictly enforced. 2 = legacy implicit EM (`imses`) path. 3 = implicit electrostatic (`isses`) path using IMSES moments/mover, rhohat Poisson, and a local chi mass inverse. CoToCoA requester/worker builds replace the emflag=0 electrostatic path and are not selected by emflag=2 or emflag=3."
         },
         "nflag_testp": {
           "type": "integer",
@@ -2113,7 +2114,7 @@
         },
         "gfactor": {
           "type": "number",
-          "description": "Implicit solver factor (default: 0.5). Controls weighting between old/new time levels."
+          "description": "Implicit solver factor (default: 0.5). Controls weighting between old/new time levels; used as iPIC3D theta in IMSES/ISSES."
         },
         "phixy": {
           "type": "number",
@@ -4471,6 +4472,31 @@
         "background_ion_charge_mode": {
           "type": "integer",
           "description": "Background ion charge mode. Canonical alias for legacy ionchg. 0=uniform neutralization, 1=local neutralization."
+        },
+        "imses_moment_smooth": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "IMSES/ISSES iPIC3D-style smoothing weight. 1.0 disables smoothing. Corresponds to iPIC3D Smooth and applies to rho/Jhat before rhohat construction; IMSES also applies it to the converted E(n+1) field."
+        },
+        "imses_moment_smooth_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of IMSES/ISSES iPIC3D-style smoothing iterations. Corresponds to iPIC3D SmoothNiter. 0 skips smoothing."
+        },
+        "imses_mover_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of IMSES/ISSES local implicit midpoint/Picard mover iterations. Corresponds to iPIC3D NiterMover. Default: 3."
+        },
+        "imses_poisson_correction": {
+          "type": "boolean",
+          "description": "Enable optional IMSES iPIC3D-style Poisson divergence cleaning before the implicit Maxwell solve. Corresponds to iPIC3D PoissonCorrection. Default: false. ISSES handles Gauss's law through the rhohat Poisson solve plus the local chi mass inverse, so this correction is not used."
+        },
+        "imses_poisson_correction_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Run IMSES Poisson divergence cleaning every N time steps when enabled. Corresponds to iPIC3D PoissonCorrectionCycle. Default: 10."
         },
         "field_boundary_mode": {
           "type": "array",

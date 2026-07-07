@@ -2481,6 +2481,11 @@
           "type": "integer",
           "description": "Maximum number of surface bounces before absorption."
         },
+        "collision_accelerator_min_boundaries": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum resolved boundary count required to enable the particle-boundary collision accelerator. 0 or 1 enables it for any nonzero boundary count; larger values keep few-boundary cases on the legacy full-boundary check_collision path. Default is 10."
+        },
         "enable_secondary_electron_emission": {
           "type": "array",
           "items": {

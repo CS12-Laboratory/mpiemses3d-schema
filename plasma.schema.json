@@ -4440,6 +4440,16 @@
           "type": "boolean",
           "description": "Separate accumulated surface charge from space charge in the Poisson solver (default: true)."
         },
+        "ignore_accumulated_charge": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use the initial neutralizing background and prescribed charge clusters instead of evolving rhobk in field sources. Continue accumulating and saving rhobk. Conductor charge_accumulation is controlled separately. Default: false."
+        },
+        "ignore_electric_field": {
+          "type": "boolean",
+          "default": false,
+          "description": "Suppress all electric forces on particles, including mesh, background, accumulated, point-charge and wave fields. Keep magnetic forces and field evolution/output. Default: false."
+        },
         "nxl": {
           "type": "integer",
           "description": "Left damping region width in x [grid cells]. Used when field_boundary_mode=2 (legacy nfbnd=2). Default: 2."

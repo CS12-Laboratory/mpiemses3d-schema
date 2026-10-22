@@ -1692,6 +1692,30 @@
         "random_seed": {
           "type": "integer",
           "description": "Random number generator seed. Omit or use -9999 to choose the simulator default; any other integer is passed to the RNG setup for deterministic initialization."
+        },
+        "checkpoint_interval": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Write a resumable checkpoint to <output>/CHECKPOINT every this many steps (ES driver; 0 disables). Must be a multiple of the field/current output intervals and of the text-diagnostic interval. Default: 0."
+        },
+        "checkpoint_keep": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of complete checkpoints kept; older ones are deleted. Default: 2."
+        },
+        "resume": {
+          "type": "string",
+          "enum": [
+            "off",
+            "auto",
+            "required"
+          ],
+          "description": "Resume from the newest complete checkpoint in <output>/CHECKPOINT in the same output directory: auto (when one exists), required (error otherwise) or off. Default: \"off\"."
+        },
+        "checkpoint_stop_walltime_min": {
+          "type": "number",
+          "minimum": 0,
+          "description": "After a checkpoint, stop the run cleanly once this wall time [min] has elapsed (for resubmission before a job time limit; 0 disables). Default: 0."
         }
       }
     },

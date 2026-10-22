@@ -186,6 +186,14 @@
         }
       ]
     },
+    "sheath": {
+      "description": "Outer-sheath coupling of the upper z face (research prototype).",
+      "allOf": [
+        {
+          "$ref": "#/$defs/sheath_group"
+        }
+      ]
+    },
     "memo": {
       "type": "object",
       "description": "Free-form notes and metadata. Not consumed by the solver. Any key/value pairs are allowed.",
@@ -1696,7 +1704,7 @@
         "checkpoint_interval": {
           "type": "integer",
           "minimum": 0,
-          "description": "Write a resumable checkpoint to <output>/CHECKPOINT every this many steps (ES driver; 0 disables). Must be a multiple of the field/current output intervals and of the text-diagnostic interval. Default: 0."
+          "description": "Write a resumable checkpoint to <output>/CHECKPOINT every this many steps (0 disables). Must be a multiple of the field/current output intervals and of the text-diagnostic interval. Default: 0."
         },
         "checkpoint_keep": {
           "type": "integer",
@@ -4363,6 +4371,175 @@
         }
       }
     },
+    "sheath_group": {
+      "type": "object",
+      "description": "Outer-sheath coupling of the upper z face to sheath-model (research prototype, ES driver only).",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable the outer-sheath coupling of the upper z face (research prototype, ES driver only). The electron and ion species need particle_boundary_mode(3, is) = 3. Default: false."
+        },
+        "electron_species": {
+          "type": "integer",
+          "description": "Species index of the upstream (solar-wind) electrons. Default: 1.",
+          "minimum": 1
+        },
+        "ion_species": {
+          "type": "integer",
+          "description": "Species index of the upstream ions. Default: 2.",
+          "minimum": 1
+        },
+        "update_interval_steps": {
+          "type": "integer",
+          "description": "Steps per window: the outflow spectrum and inner field are averaged over a window and the outer state is updated at its end. Default: 2000.",
+          "minimum": 1
+        },
+        "update_start_step": {
+          "type": "integer",
+          "description": "Hold the initial outer state until this step (lets the initial loading leave the box). Skipped after a restart that restored the outer state. Default: 0.",
+          "minimum": 0
+        },
+        "dx_m": {
+          "type": "number",
+          "description": "Grid spacing [m] for SI conversion; 0 uses [meta.unit_conversion].dx. Default: 0.0.",
+          "minimum": 0
+        },
+        "upstream_field_floor_v_m": {
+          "type": "number",
+          "description": "sheath-model search option: accept drifting Type A/C roots whose upstream field deficit is below this field [V/m] (e.g. the solar-wind motional field). Default: 0.002.",
+          "minimum": 0
+        },
+        "upstream_band_tolerance": {
+          "type": "number",
+          "description": "sheath-model search option: accepted width of the upstream negative-E^2 band relative to the minimum depth. Default: 0.0.",
+          "minimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "ion_pressure_factor": {
+          "type": "number",
+          "description": "Coefficient of the constant warm-ion pressure term of the outer fluid ions. Default: 1.0.",
+          "exclusiveMinimum": 0
+        },
+        "source_relaxation": {
+          "type": "number",
+          "description": "Weight of the new window's outflow spectrum against the previous one. Default: 0.5.",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "initial_emission_density_m3": {
+          "type": "number",
+          "description": "Initial outer source density [m^-3] of a Maxwellian; 0 derives it from the emitting species (curf, sun angle). Default: 0.0.",
+          "minimum": 0
+        },
+        "initial_emission_temperature_ev": {
+          "type": "number",
+          "description": "Initial outer source temperature [eV]; used with initial_emission_density_m3. Default: 0.0.",
+          "minimum": 0
+        },
+        "initial_branch": {
+          "type": "string",
+          "description": "Type of the initial outer root solved with the initial source. Default: \"auto\".",
+          "enum": [
+            "auto",
+            "A",
+            "B",
+            "C",
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "initial_order": {
+          "type": "string",
+          "description": "Preference order of types for the initial root (a permutation of ABC). Default: \"ABC\".",
+          "pattern": "^(ABC|ACB|BAC|BCA|CAB|CBA)$"
+        },
+        "barrier_reflection": {
+          "type": "boolean",
+          "description": "Reflect electrons crossing the top face below the outer barrier (they return from the outer sheath) instead of removing them. Default: true."
+        },
+        "reservoir_injection": {
+          "type": "boolean",
+          "description": "Regenerate the top-face injection of the electron and ion species from the outer state's upstream reservoirs. Default: true."
+        },
+        "closure": {
+          "type": "string",
+          "description": "Outer-state closure: combined (noise-weighted field continuity and current, relaxed), prescribed_field (impose E(H-) with a J=0 fallback) or zero_current (J=0 roots). Default: \"combined\".",
+          "enum": [
+            "combined",
+            "prescribed_field",
+            "zero_current"
+          ]
+        },
+        "init_from_profile": {
+          "type": "boolean",
+          "description": "Start from the standalone J=0 solution evaluated at the top face instead of treating the face as the surface. Default: true."
+        },
+        "field_fit_cells": {
+          "type": "integer",
+          "description": "Number of top planes (besides the face) in the quadratic fit of the inner potential that gives E(H-). Default: 4.",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "field_relaxation": {
+          "type": "number",
+          "description": "Weight of the new window in the exponential moving average of E(H-). Default: 0.3.",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "field_flat_v_m": {
+          "type": "number",
+          "description": "prescribed_field closure: below this |E(H-)| [V/m] the J=0 candidates are also scored. Default: 0.0.",
+          "minimum": 0
+        },
+        "potential_relaxation": {
+          "type": "number",
+          "description": "combined closure: fraction of the way phi_H moves toward the best state per window. Default: 0.5.",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "field_sigma_v_m": {
+          "type": "number",
+          "description": "combined closure: floor of the E(H-) noise used to weight the field mismatch [V/m]. Default: 0.005.",
+          "exclusiveMinimum": 0
+        },
+        "current_sigma": {
+          "type": "number",
+          "description": "combined closure: floor of the current noise relative to the ion current. Default: 0.02.",
+          "exclusiveMinimum": 0
+        },
+        "scan_span_v": {
+          "type": "number",
+          "description": "combined closure: half width of the plane-potential scan around phi_H [V]. Default: 0.6.",
+          "exclusiveMinimum": 0
+        },
+        "scan_step_v": {
+          "type": "number",
+          "description": "combined closure: plane-potential scan step [V] (span/step at most 1000). Default: 0.01.",
+          "exclusiveMinimum": 0
+        },
+        "max_step_v": {
+          "type": "number",
+          "description": "combined closure: largest change of phi_H per window [V]; 0 removes the cap. Default: 0.1.",
+          "minimum": 0
+        },
+        "hold_chi_j": {
+          "type": "number",
+          "description": "combined closure: hold phi_H while the present state's current exceeds this many sigma_J (the box is still charging); 0 disables. Default: 3.0.",
+          "minimum": 0
+        },
+        "hold_max_windows": {
+          "type": "integer",
+          "description": "combined closure: force an update after this many consecutive held windows. Default: 10.",
+          "minimum": 1
+        },
+        "init_offset_v": {
+          "type": "number",
+          "description": "Test aid: shift the initial plane potential by this amount [V] to check convergence. Default: 0.0."
+        }
+      }
+    },
     "system_group": {
       "type": "object",
       "description": "System-wide control flags: species count, boundary conditions, and field masking.",
@@ -4432,7 +4609,7 @@
           "description": "Field boundary condition per axis [x,y,z]. 0=periodic, 1=free (absorbing), 2=damping (wave-absorbing layer). Legacy spelling for field_boundary_mode."
         },
         "npbnd": {
-          "description": "Particle boundary condition per axis per species (3 x nspec). 0=periodic, 1=reflective, 2=free (escape/inject), -1=follow field_boundary_mode (legacy nfbnd). Legacy spelling for particle_boundary_mode.",
+          "description": "Particle boundary condition per axis per species (3 x nspec). 0=periodic, 1=reflective, 2=free (escape/inject), 3=outer-sheath matching plane (z only, needs [sheath]), -1=follow field_boundary_mode (legacy nfbnd). Legacy spelling for particle_boundary_mode.",
           "allOf": [
             {
               "$ref": "#/$defs/int_value"
@@ -5194,16 +5371,38 @@
         },
         "npbnd": {
           "type": "array",
-          "items": {
-            "type": "integer",
-            "enum": [
-              -1,
-              0,
-              1,
-              2
-            ]
-          },
-          "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, -1=follow nfbnd. Legacy spelling for particle_boundary_mode.",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "items": false,
+          "description": "Particle boundary condition per axis (3-element array): [x, y, z]. 0=periodic, 1=reflective, 2=free, 3=outer-sheath matching plane (z only, needs [sheath]), -1=follow nfbnd. Legacy spelling for particle_boundary_mode.",
           "minItems": 3,
           "maxItems": 3
         },
@@ -5237,15 +5436,37 @@
         },
         "particle_boundary_mode": {
           "type": "array",
-          "items": {
-            "type": "integer",
-            "enum": [
-              -1,
-              0,
-              1,
-              2
-            ]
-          },
+          "prefixItems": [
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                -1,
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "items": false,
           "description": "Particle boundary condition per axis (3-element array). Canonical alias for legacy npbnd.",
           "minItems": 3,
           "maxItems": 3

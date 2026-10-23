@@ -4397,7 +4397,7 @@
         },
         "update_start_step": {
           "type": "integer",
-          "description": "Hold the initial outer state until this step (lets the initial loading leave the box). Skipped after a restart that restored the outer state. Default: 0.",
+          "description": "Hold the initial outer state until this step (lets the initial loading leave the box). Skipped after a jobnum(1) = 1 restart that restored the outer state; a checkpoint resume decides by the restored step. Default: 0.",
           "minimum": 0
         },
         "dx_m": {
